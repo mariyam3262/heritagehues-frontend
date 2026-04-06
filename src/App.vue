@@ -894,6 +894,7 @@ const nextStorySlide = () => {
 
 .story-slider {
   position: relative;
+  width: 100%;
   overflow: hidden;
   border-radius: 16px;
   cursor: pointer;
@@ -933,11 +934,15 @@ const nextStorySlide = () => {
 
 .story-track {
   display: flex;
+  width: 100%;
   transition: transform 420ms ease;
 }
 
 .story-pane {
+  flex: 0 0 100%;
   min-width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   border-radius: 14px;
   background: linear-gradient(140deg, rgba(46, 22, 17, 0.9), rgba(26, 13, 10, 0.9));
   padding: clamp(1rem, 2.4vw, 1.6rem);
@@ -1988,6 +1993,21 @@ h2 {
 }
 
 @media (max-width: 640px) {
+  .welcome-shell {
+    align-content: start;
+    padding: 1.35rem 0.85rem 2rem;
+  }
+
+  .welcome-panel {
+    width: 100%;
+    padding: 0.85rem;
+    border-radius: 18px;
+  }
+
+  .story-slider {
+    border-radius: 14px;
+  }
+
   .hero-panel {
     padding-block: 2.6rem;
   }
@@ -2006,18 +2026,19 @@ h2 {
 
   /* Mobile responsive fixes for story section */
   .story-pane {
-    padding: clamp(1rem, 2.4vw, 1.4rem);
+    padding: 1rem 0.85rem 1.05rem;
   }
 
   .story-pane p {
-    font-size: clamp(1rem, 2.15vw, 1.2rem);
-    margin-top: 0.5rem;
+    font-size: clamp(0.98rem, 3.6vw, 1.08rem);
+    margin-top: 0.45rem;
+    line-height: 1.52;
   }
 
   .story-pane h2 {
-    font-size: clamp(1.2rem, 3.8vw, 1.8rem);
-    line-height: 1.25;
-    margin-bottom: 0.8rem;
+    font-size: clamp(1.18rem, 5vw, 1.45rem);
+    line-height: 1.22;
+    margin: 0.35rem 0 0.7rem;
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
@@ -2027,17 +2048,19 @@ h2 {
   }
 
   .story-pane h3 {
-    font-size: clamp(1.1rem, 2.35vw, 1.5rem);
+    font-size: clamp(1.08rem, 4.4vw, 1.3rem);
+    line-height: 1.22;
   }
 
   .story-pane ul,
   .story-pane ol {
-    font-size: clamp(1rem, 1.95vw, 1.1rem);
+    font-size: clamp(0.96rem, 3.5vw, 1.04rem);
     padding-left: 1rem;
+    line-height: 1.5;
   }
 
   .welcome-honor {
-    font-size: clamp(1rem, 2.15vw, 1.15rem);
+    font-size: clamp(0.98rem, 3.6vw, 1.06rem);
   }
 
   h2 {
@@ -2111,12 +2134,15 @@ h2 {
 
   /* Additional mobile fixes for story section */
   .welcome-panel {
-    padding: clamp(1rem, 2.4vw, 1.2rem);
+    width: 100%;
+    padding: 0.9rem 0.8rem;
   }
 
   .story-denoter {
+    top: 0.55rem;
+    right: 0.55rem;
     font-size: 0.7rem;
-    padding: 0.15rem 0.35rem;
+    padding: 0.14rem 0.34rem;
   }
 
   .story-denoter span {
@@ -2177,48 +2203,81 @@ h2 {
 
 @media (max-width: 480px) {
   .story-pane {
-    padding: 0.8rem;
+    padding: 0.9rem 0.75rem 0.95rem;
   }
 
   .story-pane p {
-    font-size: clamp(0.95rem, 2.15vw, 1.1rem);
-    margin-top: 0.4rem;
-    line-height: 1.5;
+    font-size: 0.92rem;
+    margin-top: 0.35rem;
+    line-height: 1.48;
+    letter-spacing: 0;
   }
 
   .story-pane h2 {
-    font-size: clamp(1rem, 3.8vw, 1.5rem);
-    line-height: 1.3;
+    font-size: 1.08rem;
+    line-height: 1.22;
     text-wrap: balance;
+    margin: 0.4rem 0 0.6rem;
+    word-break: break-word;
   }
 
   .eyebrow {
-    font-size: clamp(0.75rem, 1.8vw, 0.85rem);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    margin: 0 0 0.35rem;
   }
 
   .welcome-honor {
-    font-size: clamp(0.9rem, 2.15vw, 1rem);
+    font-size: 0.9rem;
+    margin-top: 0.6rem;
+    line-height: 1.45;
   }
 
   .story-pane h3 {
-    font-size: clamp(1rem, 2.35vw, 1.3rem);
-    margin-bottom: 0.6rem;
+    font-size: 0.98rem;
+    margin: 0 0 0.5rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.25;
   }
 
   .story-pane ul,
   .story-pane ol {
-    font-size: clamp(0.95rem, 1.95vw, 1rem);
-    padding-left: 0.8rem;
-    line-height: 1.5;
+    font-size: 0.9rem;
+    padding-left: 0.95rem;
+    line-height: 1.48;
+  }
+
+  .story-pane li + li {
+    margin-top: 0.2rem;
   }
 
   .story-denoter {
+    font-size: 0.6rem;
+    padding: 0.12rem 0.3rem;
+  }
+
+  .story-denoter span {
     font-size: 0.65rem;
   }
 
+  .story-denoter small {
+    font-size: 0.55rem;
+  }
+
   h2 {
-    font-size: clamp(1rem, 3.8vw, 1.5rem);
-    text-wrap: balance;
+    font-size: 1.1rem;
+    word-break: break-word;
+    line-height: 1.25;
+  }
+
+  .welcome-shell {
+    align-content: start;
+    padding: 1.2rem 0.7rem 1.8rem;
+  }
+
+  .welcome-panel {
+    width: 100%;
+    padding: 0.78rem 0.62rem;
   }
 }
 </style>
