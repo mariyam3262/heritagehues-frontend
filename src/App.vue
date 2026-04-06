@@ -903,9 +903,11 @@ const nextStorySlide = () => {
   width: 100%;
   min-width: 0;
   max-width: 100%;
+  display: grid;
   overflow: hidden;
   border-radius: 16px;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .story-slider:focus-visible {
@@ -944,6 +946,7 @@ const nextStorySlide = () => {
   display: flex;
   width: 100%;
   min-width: 0;
+  max-width: 100%;
   transition: transform 420ms ease;
   will-change: transform;
 }
@@ -957,7 +960,9 @@ const nextStorySlide = () => {
   border-radius: 14px;
   background: linear-gradient(140deg, rgba(46, 22, 17, 0.9), rgba(26, 13, 10, 0.9));
   padding: clamp(1rem, 2.8vw, 1.7rem);
+  padding-right: clamp(1rem, 2.8vw, 2.75rem);
   overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .story-pane p {
@@ -1000,6 +1005,7 @@ const nextStorySlide = () => {
 }
 
 .story-pane h2 {
+  margin: 0.3rem 0 0.75rem;
   max-width: 100%;
   font-size: clamp(1.3rem, 3vw, 2.15rem);
   line-height: 1.16;
@@ -1020,6 +1026,44 @@ const nextStorySlide = () => {
 
 .story-pane li + li {
   margin-top: 0.28rem;
+}
+
+@media (max-width: 900px) {
+  .welcome-shell {
+    min-height: auto;
+    padding: 1.7rem 1rem 2.4rem;
+  }
+
+  .welcome-panel {
+    border-radius: 20px;
+    padding: 1rem;
+  }
+
+  .story-pane {
+    padding: 1rem 1rem 1.1rem;
+    padding-right: 3.25rem;
+  }
+
+  .story-pane p {
+    font-size: clamp(0.98rem, 2.3vw, 1.08rem);
+    line-height: 1.52;
+  }
+
+  .story-pane h2 {
+    font-size: clamp(1.18rem, 3.4vw, 1.7rem);
+    line-height: 1.18;
+  }
+
+  .story-pane h3 {
+    font-size: clamp(1.08rem, 2.9vw, 1.38rem);
+    line-height: 1.22;
+  }
+
+  .story-pane ul,
+  .story-pane ol {
+    font-size: clamp(0.94rem, 2.15vw, 1rem);
+    line-height: 1.48;
+  }
 }
 
 
@@ -2024,6 +2068,7 @@ h2 {
   }
 
   .story-slider {
+    gap: 0.5rem;
     border-radius: 14px;
   }
 
@@ -2082,6 +2127,10 @@ h2 {
     font-size: clamp(0.95rem, 3.6vw, 1rem);
   }
 
+  .welcome-line {
+    line-height: 1.42;
+  }
+
   h2 {
     font-size: clamp(1.2rem, 3.8vw, 1.8rem);
     word-wrap: break-word;
@@ -2125,6 +2174,10 @@ h2 {
 }
 
 @media (max-width: 680px) {
+  .story-track {
+    align-items: stretch;
+  }
+
   .brand-masthead {
     grid-template-columns: minmax(0, 1fr);
     justify-items: center;
@@ -2158,10 +2211,11 @@ h2 {
   }
 
   .story-denoter {
-    top: 0.55rem;
-    right: 0.55rem;
+    position: static;
+    justify-self: end;
+    margin-right: 0.05rem;
     font-size: 0.7rem;
-    padding: 0.14rem 0.34rem;
+    padding: 0.16rem 0.38rem;
   }
 
   .story-denoter span {
@@ -2180,6 +2234,18 @@ h2 {
   .welcome-line {
     padding-left: 0.6rem;
     font-size: clamp(0.88rem, 3.25vw, 0.98rem);
+  }
+
+  .story-pane {
+    min-height: 100%;
+    padding: 0.95rem 0.82rem 1rem;
+  }
+
+  .story-pane h2,
+  .story-pane h3,
+  .story-pane p,
+  .story-pane li {
+    max-width: 100%;
   }
 }
 
@@ -2221,6 +2287,10 @@ h2 {
 }
 
 @media (max-width: 480px) {
+  .story-slider {
+    gap: 0.42rem;
+  }
+
   .story-pane {
     padding: 0.82rem 0.68rem 0.9rem;
   }
@@ -2235,7 +2305,7 @@ h2 {
   .story-pane h2 {
     font-size: 0.98rem;
     line-height: 1.18;
-    text-wrap: balance;
+    text-wrap: pretty;
     margin: 0.32rem 0 0.52rem;
     word-break: break-word;
   }
@@ -2297,6 +2367,10 @@ h2 {
   .welcome-panel {
     width: 100%;
     padding: 0.68rem 0.56rem;
+  }
+
+  .welcome-line {
+    font-size: 0.84rem;
   }
 }
 </style>

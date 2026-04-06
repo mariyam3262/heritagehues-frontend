@@ -1,4 +1,5 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL || ''
+const IMAGE_BASE = import.meta.env.VITE_IMAGE_BASE_URL || API_BASE || ''
 const API_ENCRYPTION_KEY = import.meta.env.VITE_API_ENCRYPTION_KEY || ''
 
 const SESSION_KEY = 'heritage_hues_session_id'
@@ -62,14 +63,30 @@ const toPriceLabel = (value, currency = 'INR') => {
 
 // Legacy - no longer used with backend calculation
 
+const isAbsoluteUrl = (value = '') => /^https?:\/\//i.test(String(value || ''))
+
+const isUploadPath = (value = '') => String(value || '').startsWith('/api/uploads/')
+
+const resolveAssetUrl = (value = '') => {
+  const source = String(value || '').trim()
+  if (!source) return ''
+  if (isAbsoluteUrl(source)) return source
+  if (isUploadPath(source)) {
+    if (!IMAGE_BASE) return source
+    return new URL(source, `${IMAGE_BASE.replace(/\/+$/, '')}/`).toString()
+  }
+  return source
+}
+
 const toVisualStyle = (value, fallback) => {
   if (!value) {
     return { background: fallback }
   }
-  if (value.startsWith('/api/uploads/')) {
+  const resolvedUrl = resolveAssetUrl(value)
+  if (resolvedUrl && (isUploadPath(value) || isAbsoluteUrl(resolvedUrl))) {
     return {
       backgroundColor: '#f7ead7',
-      backgroundImage: `url(${value})`,
+      backgroundImage: `url(${resolvedUrl})`,
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
       backgroundSize: 'cover',
@@ -83,7 +100,8 @@ const mapProduct = (item = {}) => {
   const gradient = product.gradient || 'linear-gradient(135deg, #772920, #cf9f64)'
   const photos = Array.isArray(product.photos) ? product.photos : []
   const rawPhotos = photos.length ? photos.slice(0, 10) : [gradient]
-  const imagePhotos = rawPhotos.filter((photo) => typeof photo === 'string' && photo.startsWith('/api/uploads/'))
+  const resolvedPhotos = rawPhotos.map((photo) => (typeof photo === 'string' ? resolveAssetUrl(photo) : photo))
+  const imagePhotos = resolvedPhotos.filter((photo) => typeof photo === 'string' && /^https?:\/\//i.test(photo))
   const mrp = Number(product.mrp || product.price || 0)
   const finalPrice = Number(product.final_price || product.price || 0)
   const discountPercent = Math.max(0, Number(product.discount_percentage || product.discount || 0))
@@ -108,7 +126,7 @@ const mapProduct = (item = {}) => {
     stockCount,
     isOutOfStock,
     gradient,
-    photos: rawPhotos,
+    photos: resolvedPhotos,
     imagePhotos,
     primaryPhoto: imagePhotos[0] || '',
     hasImagePhoto: imagePhotos.length > 0,

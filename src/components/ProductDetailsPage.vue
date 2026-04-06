@@ -32,7 +32,7 @@
           <div class="visual-track" :style="{ transform: `translateX(-${activePhotoIndex * 100}%)` }">
             <template v-for="(photo, index) in selectedProduct.photos" :key="`${selectedProduct.slug}-${index}`">
               <img
-                v-if="String(photo).startsWith('/api/uploads/')"
+                v-if="/^https?:\/\//i.test(String(photo))"
                 class="product-visual product-image"
                 :src="photo"
                 :alt="`${selectedProduct.title} image ${index + 1}`"
@@ -78,7 +78,7 @@
             @click="activePhotoIndex = index"
           >
             <img
-              v-if="String(photo).startsWith('/api/uploads/')"
+              v-if="/^https?:\/\//i.test(String(photo))"
               class="gallery-thumb-image"
               :src="photo"
               :alt="`${selectedProduct.title} thumbnail ${index + 1}`"
