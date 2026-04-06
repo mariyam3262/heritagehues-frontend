@@ -358,6 +358,7 @@ import audioWallpaperFile from './audio-wallpaper.png'
 const currentPath = typeof window !== 'undefined'
   ? window.location.pathname.toLowerCase().replace(/\/+$/, '') || '/'
   : '/'
+
 const isProductPage = currentPath === '/product' || currentPath.startsWith('/product/')
 const isCartPage = currentPath === '/cart' || currentPath.startsWith('/cart/')
 const isCheckoutSuccessPage = currentPath === '/checkout/success' || currentPath.startsWith('/checkout/success/')
@@ -978,6 +979,12 @@ const nextStorySlide = () => {
   color: #ffe7c4;
 }
 
+.story-pane h2 {
+  text-wrap: balance;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
 .story-pane ul,
 .story-pane ol {
   margin: 0.5rem 0 0;
@@ -1024,6 +1031,8 @@ const nextStorySlide = () => {
   text-transform: uppercase;
   color: #e9b66a;
   font-size: clamp(0.9rem, 1.8vw, 1.02rem);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 h1 {
@@ -1823,6 +1832,9 @@ h2 {
   font-size: clamp(1.6rem, 3.8vw, 2.4rem);
   line-height: 1.2;
   color: #c57a47;
+  text-wrap: balance;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .features-grid {
@@ -1991,6 +2003,48 @@ h2 {
   .features-shell {
     padding-top: 0.65rem;
   }
+
+  /* Mobile responsive fixes for story section */
+  .story-pane {
+    padding: clamp(1rem, 2.4vw, 1.4rem);
+  }
+
+  .story-pane p {
+    font-size: clamp(1rem, 2.15vw, 1.2rem);
+    margin-top: 0.5rem;
+  }
+
+  .story-pane h2 {
+    font-size: clamp(1.2rem, 3.8vw, 1.8rem);
+    line-height: 1.25;
+    margin-bottom: 0.8rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .eyebrow {
+    font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+  }
+
+  .story-pane h3 {
+    font-size: clamp(1.1rem, 2.35vw, 1.5rem);
+  }
+
+  .story-pane ul,
+  .story-pane ol {
+    font-size: clamp(1rem, 1.95vw, 1.1rem);
+    padding-left: 1rem;
+  }
+
+  .welcome-honor {
+    font-size: clamp(1rem, 2.15vw, 1.15rem);
+  }
+
+  h2 {
+    font-size: clamp(1.2rem, 3.8vw, 1.8rem);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
 }
 
 @media (max-width: 1024px) {
@@ -2054,6 +2108,34 @@ h2 {
   .slide-nav {
     display: none;
   }
+
+  /* Additional mobile fixes for story section */
+  .welcome-panel {
+    padding: clamp(1rem, 2.4vw, 1.2rem);
+  }
+
+  .story-denoter {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.35rem;
+  }
+
+  .story-denoter span {
+    font-size: 0.75rem;
+  }
+
+  .story-denoter small {
+    font-size: 0.6rem;
+  }
+
+  .welcome-lines {
+    gap: 0.3rem;
+    margin-top: 0.6rem;
+  }
+
+  .welcome-line {
+    padding-left: 0.6rem;
+    font-size: clamp(0.95rem, 1.95vw, 1.05rem);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2090,6 +2172,53 @@ h2 {
 
   .page-shell {
     scroll-behavior: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .story-pane {
+    padding: 0.8rem;
+  }
+
+  .story-pane p {
+    font-size: clamp(0.95rem, 2.15vw, 1.1rem);
+    margin-top: 0.4rem;
+    line-height: 1.5;
+  }
+
+  .story-pane h2 {
+    font-size: clamp(1rem, 3.8vw, 1.5rem);
+    line-height: 1.3;
+    text-wrap: balance;
+  }
+
+  .eyebrow {
+    font-size: clamp(0.75rem, 1.8vw, 0.85rem);
+  }
+
+  .welcome-honor {
+    font-size: clamp(0.9rem, 2.15vw, 1rem);
+  }
+
+  .story-pane h3 {
+    font-size: clamp(1rem, 2.35vw, 1.3rem);
+    margin-bottom: 0.6rem;
+  }
+
+  .story-pane ul,
+  .story-pane ol {
+    font-size: clamp(0.95rem, 1.95vw, 1rem);
+    padding-left: 0.8rem;
+    line-height: 1.5;
+  }
+
+  .story-denoter {
+    font-size: 0.65rem;
+  }
+
+  h2 {
+    font-size: clamp(1rem, 3.8vw, 1.5rem);
+    text-wrap: balance;
   }
 }
 </style>
