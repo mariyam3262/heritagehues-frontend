@@ -152,7 +152,7 @@
 
         <div class="profile-actions">
           <button type="button" class="btn primary" @click="login">Continue</button>
-          <a href="/" class="btn secondary">Back to store</a>
+          <a :href="homePath" class="btn secondary">Back to store</a>
         </div>
       </div>
     </section>
@@ -164,7 +164,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useSeo } from '../seo'
-import { buildOrderPath } from '../utils/routes'
+import { buildHomePath, buildOrderPath } from '../utils/routes'
 import SiteFooter from './SiteFooter.vue'
 import { createUser } from '../api/products'
 
@@ -176,6 +176,7 @@ const successMessage = ref('')
 const editing = ref(false)
 const syncingProfile = ref(false)
 const profileForm = reactive({ name: '', email: '', address: '' })
+const homePath = buildHomePath()
 
 useSeo({
   title: 'Your Profile',

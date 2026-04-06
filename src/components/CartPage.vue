@@ -1,7 +1,7 @@
 <template>
   <main class="cart-page">
     <header class="cart-header">
-      <a href="/explore">Back to Explore</a>
+      <a :href="explorePath">Back to Explore</a>
       <h1>Your Cart</h1>
     </header>
 
@@ -57,7 +57,7 @@
       <section v-else class="empty">
         <h2>No Products in Cart</h2>
         <p>Your cart is currently empty. Add a Bandhani piece to continue checkout.</p>
-        <a href="/explore">Explore Collection</a>
+        <a :href="explorePath">Explore Collection</a>
       </section>
     </div>
     <SiteFooter />
@@ -68,13 +68,14 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { fetchCart, removeCartItem, updateCartItem } from '../api/products'
 import { useSeo } from '../seo'
-import { buildCheckoutPath } from '../utils/routes'
+import { buildCheckoutPath, buildExplorePath } from '../utils/routes'
 import { clearCart, setCartCount } from '../utils/cartStore'
 import SiteFooter from './SiteFooter.vue'
 
 const cartItems = ref([])
 const isCheckingOut = ref(false)
 const checkoutError = ref('')
+const explorePath = buildExplorePath()
 const total = computed(() =>
   cartItems.value.reduce((sum, item) => sum + Number(item.line_total || 0), 0)
 )

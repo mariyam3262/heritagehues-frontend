@@ -37,7 +37,7 @@
             Every Bandhani drape you choose protects a fragile craft, strengthens rural women, and keeps India’s cultural memory alive for the next generation.
           </p>
           <p class="living-line fade-in-up delay-3" aria-live="polite">{{ feelMessages[activeFeelIndex] }}</p>
-          <a class="cta fade-in-up delay-4" href="/explore">Explore the Collection</a>
+          <a class="cta fade-in-up delay-4" :href="explorePath">Explore the Collection</a>
         </div>
         <div class="motif motif-bottom" aria-hidden="true"></div>
       </section>
@@ -354,10 +354,9 @@ import { fetchCart } from './api/products'
 import { useSeo } from './seo'
 import signatureAudioFile from './audio.mp3'
 import audioWallpaperFile from './audio-wallpaper.png'
+import { buildExplorePath, getCurrentPage } from './utils/routes'
 
-const currentPath = typeof window !== 'undefined'
-  ? window.location.pathname.toLowerCase().replace(/\/+$/, '') || '/'
-  : '/'
+const currentPath = getCurrentPage()
 
 const isProductPage = currentPath === '/product' || currentPath.startsWith('/product/')
 const isCartPage = currentPath === '/cart' || currentPath.startsWith('/cart/')
@@ -399,6 +398,7 @@ const selectedColorCombo = ref('royal-maroon-mustard')
 const logoSrc = logoFile
 const signatureAudioSrc = signatureAudioFile
 const audioWallpaperSrc = audioWallpaperFile
+const explorePath = buildExplorePath()
 const logoLoadFailed = ref(false)
 const couponInput = ref('')
 const appliedCouponCode = ref('')
@@ -867,14 +867,20 @@ const nextStorySlide = () => {
 .welcome-shell {
   min-height: 100svh;
   width: 100%;
-  padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 4vw, 3rem);
+  max-width: 100%;
+  padding: clamp(2rem, 6vw, 4rem) clamp(0.75rem, 3.2vw, 2rem);
   display: grid;
   align-content: center;
   justify-items: center;
+  overflow-x: hidden;
 }
 
 .welcome-panel {
-  width: min(1220px, 100%);
+  width: 100%;
+  max-width: 1040px;
+  max-width: 100%;
+  min-width: 0;
+  justify-self: stretch;
   border-radius: 22px;
   border: 1px solid rgba(192, 149, 87, 0.4);
   background:
@@ -895,6 +901,8 @@ const nextStorySlide = () => {
 .story-slider {
   position: relative;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   overflow: hidden;
   border-radius: 16px;
   cursor: pointer;
@@ -935,24 +943,29 @@ const nextStorySlide = () => {
 .story-track {
   display: flex;
   width: 100%;
+  min-width: 0;
   transition: transform 420ms ease;
+  will-change: transform;
 }
 
 .story-pane {
   flex: 0 0 100%;
+  width: 100%;
   min-width: 100%;
   max-width: 100%;
   box-sizing: border-box;
   border-radius: 14px;
   background: linear-gradient(140deg, rgba(46, 22, 17, 0.9), rgba(26, 13, 10, 0.9));
-  padding: clamp(1rem, 2.4vw, 1.6rem);
+  padding: clamp(1rem, 2.8vw, 1.7rem);
+  overflow-wrap: anywhere;
 }
 
 .story-pane p {
   margin: 0.7rem 0 0;
+  max-width: 100%;
   color: #f1dbb9;
-  font-size: clamp(1.16rem, 2.15vw, 1.42rem);
-  line-height: 1.6;
+  font-size: clamp(1rem, 1.7vw, 1.24rem);
+  line-height: 1.58;
 }
 
 .welcome-honor {
@@ -979,12 +992,17 @@ const nextStorySlide = () => {
 
 .story-pane h3 {
   margin: 0;
+  max-width: 100%;
   font-family: "Cinzel", serif;
-  font-size: clamp(1.36rem, 2.35vw, 1.9rem);
+  font-size: clamp(1.18rem, 2.4vw, 1.72rem);
+  line-height: 1.2;
   color: #ffe7c4;
 }
 
 .story-pane h2 {
+  max-width: 100%;
+  font-size: clamp(1.3rem, 3vw, 2.15rem);
+  line-height: 1.16;
   text-wrap: balance;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -993,10 +1011,11 @@ const nextStorySlide = () => {
 .story-pane ul,
 .story-pane ol {
   margin: 0.5rem 0 0;
-  padding-left: 1.15rem;
+  max-width: 100%;
+  padding-left: 1.1rem;
   color: #f0d7b3;
-  font-size: clamp(1.12rem, 1.95vw, 1.3rem);
-  line-height: 1.58;
+  font-size: clamp(0.98rem, 1.6vw, 1.14rem);
+  line-height: 1.56;
 }
 
 .story-pane li + li {
@@ -1995,12 +2014,12 @@ h2 {
 @media (max-width: 640px) {
   .welcome-shell {
     align-content: start;
-    padding: 1.35rem 0.85rem 2rem;
+    padding: 1.1rem 0.75rem 1.8rem;
   }
 
   .welcome-panel {
     width: 100%;
-    padding: 0.85rem;
+    padding: 0.8rem;
     border-radius: 18px;
   }
 
@@ -2026,17 +2045,17 @@ h2 {
 
   /* Mobile responsive fixes for story section */
   .story-pane {
-    padding: 1rem 0.85rem 1.05rem;
+    padding: 0.95rem 0.8rem 1rem;
   }
 
   .story-pane p {
-    font-size: clamp(0.98rem, 3.6vw, 1.08rem);
+    font-size: clamp(0.94rem, 3.7vw, 1.02rem);
     margin-top: 0.45rem;
-    line-height: 1.52;
+    line-height: 1.48;
   }
 
   .story-pane h2 {
-    font-size: clamp(1.18rem, 5vw, 1.45rem);
+    font-size: clamp(1.02rem, 5.2vw, 1.28rem);
     line-height: 1.22;
     margin: 0.35rem 0 0.7rem;
     word-wrap: break-word;
@@ -2048,19 +2067,19 @@ h2 {
   }
 
   .story-pane h3 {
-    font-size: clamp(1.08rem, 4.4vw, 1.3rem);
+    font-size: clamp(1rem, 4.5vw, 1.16rem);
     line-height: 1.22;
   }
 
   .story-pane ul,
   .story-pane ol {
-    font-size: clamp(0.96rem, 3.5vw, 1.04rem);
-    padding-left: 1rem;
-    line-height: 1.5;
+    font-size: clamp(0.9rem, 3.45vw, 0.98rem);
+    padding-left: 0.95rem;
+    line-height: 1.44;
   }
 
   .welcome-honor {
-    font-size: clamp(0.98rem, 3.6vw, 1.06rem);
+    font-size: clamp(0.95rem, 3.6vw, 1rem);
   }
 
   h2 {
@@ -2135,7 +2154,7 @@ h2 {
   /* Additional mobile fixes for story section */
   .welcome-panel {
     width: 100%;
-    padding: 0.9rem 0.8rem;
+    padding: 0.82rem 0.72rem;
   }
 
   .story-denoter {
@@ -2160,7 +2179,7 @@ h2 {
 
   .welcome-line {
     padding-left: 0.6rem;
-    font-size: clamp(0.95rem, 1.95vw, 1.05rem);
+    font-size: clamp(0.88rem, 3.25vw, 0.98rem);
   }
 }
 
@@ -2203,21 +2222,21 @@ h2 {
 
 @media (max-width: 480px) {
   .story-pane {
-    padding: 0.9rem 0.75rem 0.95rem;
+    padding: 0.82rem 0.68rem 0.9rem;
   }
 
   .story-pane p {
-    font-size: 0.92rem;
-    margin-top: 0.35rem;
-    line-height: 1.48;
+    font-size: 0.88rem;
+    margin-top: 0.32rem;
+    line-height: 1.42;
     letter-spacing: 0;
   }
 
   .story-pane h2 {
-    font-size: 1.08rem;
-    line-height: 1.22;
+    font-size: 0.98rem;
+    line-height: 1.18;
     text-wrap: balance;
-    margin: 0.4rem 0 0.6rem;
+    margin: 0.32rem 0 0.52rem;
     word-break: break-word;
   }
 
@@ -2228,23 +2247,23 @@ h2 {
   }
 
   .welcome-honor {
-    font-size: 0.9rem;
-    margin-top: 0.6rem;
-    line-height: 1.45;
+    font-size: 0.88rem;
+    margin-top: 0.5rem;
+    line-height: 1.4;
   }
 
   .story-pane h3 {
-    font-size: 0.98rem;
-    margin: 0 0 0.5rem;
-    margin-bottom: 0.5rem;
-    line-height: 1.25;
+    font-size: 0.92rem;
+    margin: 0 0 0.42rem;
+    margin-bottom: 0.42rem;
+    line-height: 1.18;
   }
 
   .story-pane ul,
   .story-pane ol {
-    font-size: 0.9rem;
-    padding-left: 0.95rem;
-    line-height: 1.48;
+    font-size: 0.84rem;
+    padding-left: 0.88rem;
+    line-height: 1.36;
   }
 
   .story-pane li + li {
@@ -2272,12 +2291,12 @@ h2 {
 
   .welcome-shell {
     align-content: start;
-    padding: 1.2rem 0.7rem 1.8rem;
+    padding: 0.95rem 0.55rem 1.45rem;
   }
 
   .welcome-panel {
     width: 100%;
-    padding: 0.78rem 0.62rem;
+    padding: 0.68rem 0.56rem;
   }
 }
 </style>

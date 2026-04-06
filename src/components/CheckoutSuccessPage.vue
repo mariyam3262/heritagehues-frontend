@@ -12,8 +12,8 @@
       </p>
       <p v-if="orderRef" class="order-ref">Order Ref: <strong>{{ orderRef }}</strong></p>
       <div class="actions">
-        <a href="/explore">Continue Shopping</a>
-        <a href="/cart">View Cart</a>
+        <a :href="explorePath">Continue Shopping</a>
+        <a :href="cartPath">View Cart</a>
         <a v-if="orderId" :href="buildOrderPath(orderId)">Track Order</a>
       </div>
     </section>
@@ -22,7 +22,7 @@
 
 <script setup>
 import { useSeo } from '../seo'
-import { buildOrderPath, getCurrentCheckoutSuccessOrderId } from '../utils/routes'
+import { buildCartPath, buildExplorePath, buildOrderPath, getCurrentCheckoutSuccessOrderId } from '../utils/routes'
 
 const stored = typeof window !== 'undefined'
   ? window.sessionStorage.getItem('heritage_hues_checkout_success')
@@ -41,6 +41,8 @@ const orderRef = parsed.order_ref || ''
 const orderId = parsed.order_id || getCurrentCheckoutSuccessOrderId() || ''
 const status = parsed.status || ''
 const isSubmitted = status === 'submitted' || status === 'payment_submitted' || status === 'verification_pending'
+const explorePath = buildExplorePath()
+const cartPath = buildCartPath()
 
 useSeo({
   title: isSubmitted ? 'Payment Submitted' : 'Order Confirmed',

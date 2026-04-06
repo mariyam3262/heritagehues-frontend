@@ -1,7 +1,7 @@
 <template>
   <main class="tracking-page">
     <header class="tracking-header">
-      <a href="/explore">Back to Explore</a>
+      <a :href="explorePath">Back to Explore</a>
       <div class="tracking-heading">
         <p class="eyebrow">Heritage Hues</p>
         <h1>Order Tracking</h1>
@@ -123,7 +123,7 @@
     <section v-else class="empty-state">
       <h2>Order not found</h2>
       <p>The tracking link is invalid or this order is not available in your current session.</p>
-      <a href="/explore">Continue Shopping</a>
+      <a :href="explorePath">Continue Shopping</a>
     </section>
 
     <SiteFooter />
@@ -134,10 +134,11 @@
 import { computed, onMounted, ref } from 'vue'
 import { fetchOrderDetails } from '../api/products'
 import { useSeo } from '../seo'
-import { getCurrentOrderId, replaceWithPath, buildOrderPath } from '../utils/routes'
+import { buildExplorePath, getCurrentOrderId, replaceWithPath, buildOrderPath } from '../utils/routes'
 import SiteFooter from './SiteFooter.vue'
 
 const orderId = getCurrentOrderId()
+const explorePath = buildExplorePath()
 
 if (typeof window !== 'undefined' && window.location.pathname.toLowerCase() === '/order' && orderId) {
   replaceWithPath(buildOrderPath(orderId))

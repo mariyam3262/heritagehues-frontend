@@ -2,8 +2,8 @@
   <main class="explore-page">
     <header class="explore-hero">
       <div class="hero-top">
-        <a class="back-link" href="/">Back to Home</a>
-        <a class="header-cart" href="/cart" aria-label="Open cart">
+        <a class="back-link" :href="homePath">Back to Home</a>
+        <a class="header-cart" :href="cartPath" aria-label="Open cart">
           <span class="cart-icon" aria-hidden="true">🛒</span>
           <span v-if="cartCount > 0" class="cart-count">{{ cartCount }}</span>
         </a>
@@ -73,7 +73,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { fetchCart, fetchProducts } from '../api/products'
 import { useSeo } from '../seo'
-import { buildProductPath } from '../utils/routes'
+import { buildCartPath, buildHomePath, buildProductPath } from '../utils/routes'
 import { setCartCount } from '../utils/cartStore'
 import SiteFooter from './SiteFooter.vue'
 
@@ -82,6 +82,8 @@ const cartCount = ref(0)
 const items = ref([])
 const loading = ref(true)
 const error = ref('')
+const homePath = buildHomePath()
+const cartPath = buildCartPath()
 
 useSeo({
   title: 'Explore Bandhani Collection',

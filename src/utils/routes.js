@@ -3,22 +3,59 @@ const normalizeSegment = (value = '') =>
     .trim()
     .replace(/^\/+|\/+$/g, '')
 
-export const buildProductPath = (slug = '') => `/product/${encodeURIComponent(normalizeSegment(slug))}`
+const getEntryPath = () => {
+  if (typeof window === 'undefined') return '/'
+  const pathname = String(window.location.pathname || '/')
+  return pathname.toLowerCase().endsWith('.html') ? pathname : '/'
+}
 
-export const buildOrderPath = (orderId = '') => `/order/${encodeURIComponent(normalizeSegment(orderId))}`
+const buildQueryPath = (page = '', params = {}) => {
+  const search = new URLSearchParams()
+  if (page) search.set('page', normalizeSegment(page).toLowerCase())
+  Object.entries(params).forEach(([key, value]) => {
+    const normalized = normalizeSegment(value)
+    if (normalized) search.set(key, normalized)
+  })
+  const query = search.toString()
+  return query ? `${getEntryPath()}?${query}` : getEntryPath()
+}
+
+export const getCurrentPage = () => {
+  if (typeof window === 'undefined') return '/'
+  const params = new URLSearchParams(window.location.search)
+  const page = normalizeSegment(params.get('page')).toLowerCase()
+  if (page === 'checkout-success') return '/checkout/success'
+  if (page) return `/${page}`
+
+  const pathname = window.location.pathname.toLowerCase().replace(/\/+$/, '') || '/'
+  if (pathname === '/index.html') return '/'
+  return pathname
+}
+
+export const buildHomePath = () => buildQueryPath('')
+
+export const buildExplorePath = () => buildQueryPath('explore')
+
+export const buildCartPath = () => buildQueryPath('cart')
+
+export const buildProfilePath = () => buildQueryPath('profile')
+
+export const buildProductPath = (slug = '') => buildQueryPath('product', { item: slug })
+
+export const buildOrderPath = (orderId = '') => buildQueryPath('order', { id: orderId })
 
 export const buildCheckoutPath = (sessionId = '') => {
   const clean = normalizeSegment(sessionId)
-  return clean ? `/checkout/${encodeURIComponent(clean)}` : '/checkout'
+  return buildQueryPath('checkout', clean ? { session_id: clean } : {})
 }
 
 export const buildCheckoutSuccessPath = (orderId = '') => {
   const clean = normalizeSegment(orderId)
-  return clean ? `/checkout/success/${encodeURIComponent(clean)}` : '/checkout/success'
+  return buildQueryPath('checkout-success', clean ? { order_id: clean } : {})
 }
 
 export const getPathSegments = (pathname) => {
-  const source = pathname ?? (typeof window !== 'undefined' ? window.location.pathname : '/')
+  const source = pathname ?? getCurrentPage()
   return String(source || '/')
     .split('/')
     .map((segment) => segment.trim())

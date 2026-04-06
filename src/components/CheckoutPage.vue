@@ -1,7 +1,7 @@
 <template>
   <main class="checkout-page">
     <header class="checkout-header">
-      <a href="/cart">Back to Cart</a>
+      <a :href="cartPath">Back to Cart</a>
       <h1>Checkout</h1>
     </header>
 
@@ -109,7 +109,7 @@ import { onMounted, ref } from 'vue'
 import { clearCart, setCartCount } from '../utils/cartStore'
 import { confirmUpiPayment, createUpiOrder, fetchCheckoutSummary, fetchUpiLink, getSessionId } from '../api/products'
 import { useSeo } from '../seo'
-import { buildCheckoutSuccessPath, getCurrentCheckoutSessionId } from '../utils/routes'
+import { buildCartPath, buildCheckoutSuccessPath, getCurrentCheckoutSessionId } from '../utils/routes'
 import SiteFooter from './SiteFooter.vue'
 
 const getLocalCurrentUser = () => {
@@ -126,6 +126,7 @@ const getLocalCurrentUser = () => {
 const currentUser = getLocalCurrentUser()
 
 const sessionId = getCurrentCheckoutSessionId() || getSessionId()
+const cartPath = buildCartPath()
 
 const address = ref({
   name: '',

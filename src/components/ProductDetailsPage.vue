@@ -3,13 +3,13 @@
     <div v-if="showToast" class="toast" role="status" aria-live="polite">{{ toastMessage }}</div>
 
     <header class="top-row">
-      <a class="back-link" href="/explore">Back to Explore</a>
+      <a class="back-link" :href="explorePath">Back to Explore</a>
       <div class="top-right">
         <p class="brand">Heritage Hues</p>
-        <a class="header-profile" href="/profile" aria-label="Open profile">
+        <a class="header-profile" :href="profilePath" aria-label="Open profile">
           <span class="profile-icon" aria-hidden="true">👤</span>
         </a>
-        <a class="header-cart" href="/cart" aria-label="Open cart">
+        <a class="header-cart" :href="cartPath" aria-label="Open cart">
           <span class="cart-icon" aria-hidden="true">🛒</span>
           <span v-if="cartCount > 0" class="cart-count">{{ cartCount }}</span>
         </a>
@@ -212,7 +212,7 @@
         This product is not available or the link is invalid. Explore our collection to discover handcrafted Bandhani
         pieces.
       </p>
-      <a href="/explore">Go to Explore Collection</a>
+      <a :href="explorePath">Go to Explore Collection</a>
     </section>
 
     <div v-if="paymentSheet" class="payment-sheet-backdrop" @click.self="closePaymentSheet">
@@ -247,12 +247,15 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useHead } from '@unhead/vue'
 import { addCartItem, buyNow, fetchCart, fetchProducts } from '../api/products'
 import { setCartCount } from '../utils/cartStore'
-import { buildProductPath, getCurrentProductSlug, replaceWithPath } from '../utils/routes'
+import { buildCartPath, buildExplorePath, buildProductPath, buildProfilePath, getCurrentProductSlug, replaceWithPath } from '../utils/routes'
 import ProductReviews from './ProductReviews.vue'
 import SiteFooter from './SiteFooter.vue'
 
 const activePhotoIndex = ref(0)
 const cartCount = ref(0)
+const explorePath = buildExplorePath()
+const profilePath = buildProfilePath()
+const cartPath = buildCartPath()
 const showToast = ref(false)
 const toastMessage = ref('')
 const loading = ref(true)

@@ -3,9 +3,9 @@
     <div class="footer-inner">
       <p>Heritage Hues | Tradition meets elegance</p>
       <nav>
-        <a href="/">Home</a>
-        <a href="/explore">Collection</a>
-        <a href="/cart">Cart</a>
+        <a :href="homePath">Home</a>
+        <a :href="explorePath">Collection</a>
+        <a :href="cartPath">Cart</a>
         <a href="mailto:care.heritagehues@gmail.com" aria-label="Email">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" />
@@ -19,7 +19,12 @@
 </template>
 
 <script setup>
+import { buildCartPath, buildExplorePath, buildHomePath } from '../utils/routes'
+
 const year = new Date().getFullYear()
+const homePath = buildHomePath()
+const explorePath = buildExplorePath()
+const cartPath = buildCartPath()
 </script>
 
 <style scoped>
