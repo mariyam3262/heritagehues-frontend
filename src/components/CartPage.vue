@@ -11,7 +11,7 @@
           <div v-for="item in cartItems" :key="item.slug" class="cart-item">
             <div
               class="thumb"
-              :style="item.photos && item.photos[0] ? { backgroundImage: `url(${item.photos[0]})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}"
+              :style="buildThumbStyle(item)"
               aria-hidden="true"
             ></div>
             <div class="meta">
@@ -68,6 +68,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { fetchCart, removeCartItem, updateCartItem } from '../api/products'
 import { useSeo } from '../seo'
+import { backgroundImageWithFallback } from '../utils/imageFallback'
 import { buildCheckoutPath, buildExplorePath } from '../utils/routes'
 import { clearCart, setCartCount } from '../utils/cartStore'
 import SiteFooter from './SiteFooter.vue'
@@ -79,6 +80,17 @@ const explorePath = buildExplorePath()
 const total = computed(() =>
   cartItems.value.reduce((sum, item) => sum + Number(item.line_total || 0), 0)
 )
+
+const buildThumbStyle = (item) => {
+  const source = Array.isArray(item?.photos) ? item.photos[0] : ''
+  return {
+    backgroundImage: backgroundImageWithFallback(source),
+    backgroundSize: 'cover, cover',
+    backgroundPosition: 'center, center',
+    backgroundRepeat: 'no-repeat, no-repeat',
+    backgroundColor: '#f8ead4',
+  }
+}
 
 useSeo({
   title: 'Your Cart',

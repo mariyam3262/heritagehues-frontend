@@ -1,4 +1,5 @@
 import { useHead } from '@unhead/vue'
+import { DEFAULT_PRODUCT_IMAGE } from './utils/imageFallback'
 
 const SITE_NAME = 'Heritage Hues'
 const DEFAULT_DESCRIPTION =
@@ -31,7 +32,7 @@ export const useSeo = ({
   description = DEFAULT_DESCRIPTION,
   path = '/',
   keywords = DEFAULT_KEYWORDS,
-  image = '/logo.png',
+  image = DEFAULT_PRODUCT_IMAGE,
   type = 'website',
 }) => {
   const fullTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME

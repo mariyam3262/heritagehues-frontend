@@ -34,10 +34,11 @@
               <img
                 v-if="/^https?:\/\//i.test(String(photo))"
                 class="product-visual product-image"
-                :src="photo"
+                :src="withFallbackImage(photo)"
                 :alt="`${selectedProduct.title} image ${index + 1}`"
                 :loading="index === 0 ? 'eager' : 'lazy'"
                 decoding="async"
+                @error="applyImageFallback"
               />
               <div
                 v-else
@@ -80,10 +81,11 @@
             <img
               v-if="/^https?:\/\//i.test(String(photo))"
               class="gallery-thumb-image"
-              :src="photo"
+              :src="withFallbackImage(photo)"
               :alt="`${selectedProduct.title} thumbnail ${index + 1}`"
               loading="lazy"
               decoding="async"
+              @error="applyImageFallback"
             />
             <span v-else class="gallery-thumb-image" :style="selectedProduct.visualStyles[index]"></span>
           </button>
@@ -192,10 +194,11 @@
           <img
             v-if="item.primaryPhoto"
             class="mini-image"
-            :src="item.primaryPhoto"
+            :src="withFallbackImage(item.primaryPhoto)"
             :alt="`${item.title} by Heritage Hues`"
             loading="lazy"
             decoding="async"
+            @error="applyImageFallback"
           />
           <div v-else class="mini-swatch" :style="item.visualStyles[0] || { background: item.gradient }" aria-hidden="true"></div>
           <p>{{ item.title }}</p>
@@ -246,6 +249,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useHead } from '@unhead/vue'
 import { addCartItem, buyNow, fetchCart, fetchProducts } from '../api/products'
+import { applyImageFallback, DEFAULT_PRODUCT_IMAGE, withFallbackImage } from '../utils/imageFallback'
 import { setCartCount } from '../utils/cartStore'
 import { buildCartPath, buildExplorePath, buildProductPath, buildProfilePath, getCurrentProductSlug, replaceWithPath } from '../utils/routes'
 import ProductReviews from './ProductReviews.vue'
@@ -283,9 +287,7 @@ useHead(() => {
     ? `${product.description}`.slice(0, 160)
     : 'Discover premium handcrafted Bandhani sarees with secure checkout, inclusive pricing, and artisan-led design.'
   const canonicalPath = product?.slug ? buildProductPath(product.slug) : `/product/${encodeURIComponent(selectedSlug || '')}`
-  const image = product?.primaryPhoto
-    ? new URL(product.primaryPhoto, window.location.origin).toString()
-    : `${window.location.origin}/logo.png`
+  const image = new URL(withFallbackImage(product?.primaryPhoto || DEFAULT_PRODUCT_IMAGE), window.location.origin).toString()
 
   return {
     title,

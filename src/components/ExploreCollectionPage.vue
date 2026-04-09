@@ -36,10 +36,11 @@
         <img
           v-if="item.primaryPhoto"
           class="card-image"
-          :src="item.primaryPhoto"
+          :src="withFallbackImage(item.primaryPhoto)"
           :alt="`${item.title} by Heritage Hues`"
           loading="lazy"
           decoding="async"
+          @error="applyImageFallback"
         />
         <div v-else class="card-swatch" :style="item.visualStyles[0] || { background: item.gradient }" aria-hidden="true"></div>
         <p class="card-tag">{{ item.category }}</p>
@@ -73,6 +74,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { fetchCart, fetchProducts } from '../api/products'
 import { useSeo } from '../seo'
+import { applyImageFallback, withFallbackImage } from '../utils/imageFallback'
 import { buildCartPath, buildHomePath, buildProductPath } from '../utils/routes'
 import { setCartCount } from '../utils/cartStore'
 import SiteFooter from './SiteFooter.vue'

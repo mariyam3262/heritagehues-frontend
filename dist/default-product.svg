@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" role="img" aria-labelledby="title desc">
+  <title id="title">Heritage Hues default product image</title>
+  <desc id="desc">A branded fallback image for product listings when the original product image is missing.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3c1712" />
+      <stop offset="55%" stop-color="#7f3024" />
+      <stop offset="100%" stop-color="#d2a063" />
+    </linearGradient>
+    <linearGradient id="panel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff4df" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#f2d7ab" stop-opacity="0.9" />
+    </linearGradient>
+    <pattern id="dots" width="48" height="48" patternUnits="userSpaceOnUse">
+      <circle cx="10" cy="10" r="3" fill="#f5d59b" fill-opacity="0.18" />
+      <circle cx="30" cy="22" r="2.5" fill="#f5d59b" fill-opacity="0.16" />
+      <circle cx="18" cy="36" r="2.5" fill="#f5d59b" fill-opacity="0.14" />
+    </pattern>
+  </defs>
+  <rect width="1200" height="1200" fill="url(#bg)" />
+  <rect width="1200" height="1200" fill="url(#dots)" />
+  <rect x="180" y="180" width="840" height="840" rx="36" fill="url(#panel)" stroke="#e7c48e" stroke-width="6" />
+  <g fill="none" stroke="#8a3929" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M430 395c48-60 117-95 170-95 58 0 124 33 171 95" stroke-width="18" />
+    <path d="M383 505c62-76 139-117 217-117 81 0 154 40 217 117" stroke-width="14" opacity="0.9" />
+    <path d="M350 631c74-45 159-69 250-69 90 0 177 24 250 69" stroke-width="12" opacity="0.88" />
+  </g>
+  <g fill="#7b2e21">
+    <circle cx="470" cy="470" r="10" />
+    <circle cx="550" cy="440" r="10" />
+    <circle cx="640" cy="452" r="10" />
+    <circle cx="730" cy="474" r="10" />
+    <circle cx="430" cy="575" r="9" />
+    <circle cx="520" cy="550" r="9" />
+    <circle cx="610" cy="575" r="9" />
+    <circle cx="700" cy="548" r="9" />
+    <circle cx="790" cy="580" r="9" />
+    <circle cx="465" cy="678" r="8" />
+    <circle cx="555" cy="650" r="8" />
+    <circle cx="645" cy="672" r="8" />
+    <circle cx="735" cy="645" r="8" />
+  </g>
+  <text x="600" y="815" text-anchor="middle" font-size="72" font-family="Georgia, 'Times New Roman', serif" fill="#5b2218" letter-spacing="6">
+    HERITAGE HUES
+  </text>
+  <text x="600" y="890" text-anchor="middle" font-size="34" font-family="Arial, Helvetica, sans-serif" fill="#8a4d33">
+    Handcrafted Bandhani
+  </text>
+</svg>
