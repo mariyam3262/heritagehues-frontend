@@ -45,8 +45,16 @@
         <div v-else class="card-swatch" :style="item.visualStyles[0] || { background: item.gradient }" aria-hidden="true"></div>
         <p class="card-tag">{{ item.category }}</p>
         <h2>{{ item.title }}</h2>
-        <p class="card-copy">{{ item.description }}</p>
-        <p class="stock-note" :class="{ sold: item.isOutOfStock, scarce: !item.isOutOfStock && item.stockCount === 1 }">
+        <ul v-if="item.bullets.length" class="card-points" aria-label="Product highlights">
+          <li v-for="(point, index) in item.bullets.slice(0, 3)" :key="`${item.slug}-point-${index}`">
+            {{ point }}
+          </li>
+        </ul>
+        <p
+          v-if="item.isOutOfStock || item.stockCount <= 3"
+          class="stock-note"
+          :class="{ sold: item.isOutOfStock, scarce: !item.isOutOfStock && item.stockCount === 1 }"
+        >
           {{
             item.isOutOfStock
               ? 'Out of stock'
@@ -321,10 +329,17 @@ h2 {
   font-size: 1.15rem;
 }
 
-.card-copy {
-  margin: 0.45rem 0 0;
+.card-points {
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
   color: #f0d7b3;
   line-height: 1.45;
+  display: grid;
+  gap: 0.22rem;
+}
+
+.card-points li::marker {
+  color: #efbf79;
 }
 
 .stock-note {

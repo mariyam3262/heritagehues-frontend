@@ -48,6 +48,7 @@
               {{ paying ? 'Preparing UPI...' : 'Pay via UPI' }}
             </button>
             <p class="upi-copy">After payment, enter transaction ID to confirm your order</p>
+            <p class="policy-note"><strong>No Return Policy:</strong> Orders placed on this payment page are non-returnable.</p>
           </section>
         </template>
       </aside>
@@ -65,6 +66,7 @@
       <div class="payment-layout">
         <div class="payment-card">
           <p class="payment-text">Use your preferred UPI app to pay securely.</p>
+          <p class="policy-note"><strong>No Return Policy:</strong> Orders placed on this payment page are non-returnable.</p>
           <div class="payment-meta">
             <p><span>Order</span><strong>{{ activeUpiOrder.order_ref }}</strong></p>
           </div>
@@ -351,6 +353,7 @@ textarea {
 .total-line,
 .summary-notes p,
 .payment-text,
+.policy-note,
 .upi-copy,
 .upi-kicker,
 .upi-amount {
@@ -445,6 +448,17 @@ textarea {
 
 .payment-meta span {
   color: #7a4a3c;
+}
+
+.policy-note {
+  margin-top: 0.9rem;
+  font-weight: 700;
+  color: #ffe2b8;
+  line-height: 1.5;
+}
+
+.payment-card .policy-note {
+  color: #8a2d1d;
 }
 
 .qr-card {

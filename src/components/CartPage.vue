@@ -21,7 +21,11 @@
                 <p class="price">{{ formatInr(item.unit_price) }}</p>
                 <small class="gst-note">Inclusive of all taxes</small>
               </div>
-              <p class="stock-note" :class="{ sold: item.available_stock <= 0, scarce: item.available_stock === 1 }">
+              <p
+                v-if="item.available_stock <= 0 || item.available_stock <= 3"
+                class="stock-note"
+                :class="{ sold: item.available_stock <= 0, scarce: item.available_stock === 1 }"
+              >
                 {{
                   item.available_stock <= 0
                     ? 'Out of stock'

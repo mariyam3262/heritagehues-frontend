@@ -123,7 +123,11 @@
             </div>
           </div>
         </div>
-        <p class="stock-state" :class="{ sold: selectedProduct.isOutOfStock, scarce: !selectedProduct.isOutOfStock && selectedProduct.stockCount === 1 }">
+        <p
+          v-if="selectedProduct.isOutOfStock || selectedProduct.stockCount <= 3"
+          class="stock-state"
+          :class="{ sold: selectedProduct.isOutOfStock, scarce: !selectedProduct.isOutOfStock && selectedProduct.stockCount === 1 }"
+        >
           {{
             selectedProduct.isOutOfStock
               ? 'Out of stock'
