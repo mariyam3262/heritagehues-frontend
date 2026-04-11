@@ -20,36 +20,71 @@
     <p v-else-if="error" class="status-line error">{{ error }}</p>
 
     <section v-else-if="selectedProduct" class="product-hero">
-      <div class="visual-slider" :class="{ multi: selectedProduct.photos.length > 1 }" aria-label="Product image gallery">
+      <div
+        class="visual-slider"
+        :class="{ multi: selectedProduct.photos.length > 1 }"
+        aria-label="Product image gallery"
+      >
         <div v-if="selectedProduct.photos.length > 1" class="slider-topbar">
-          <span class="media-count">{{ String(activePhotoIndex + 1).padStart(2, '0') }} / {{ String(selectedProduct.photos.length).padStart(2, '0') }}</span>
+          <span class="media-count">
+            {{ String(activePhotoIndex + 1).padStart(2, '0') }} /
+            {{ String(selectedProduct.photos.length).padStart(2, '0') }}
+          </span>
           <div class="media-progress" aria-hidden="true">
-            <span :style="{ width: `${((activePhotoIndex + 1) / selectedProduct.photos.length) * 100}%` }"></span>
+            <span
+              :style="{ width: `${((activePhotoIndex + 1) / selectedProduct.photos.length) * 100}%` }"
+            ></span>
           </div>
         </div>
 
         <div class="visual-window">
-          <div class="visual-track" :style="{ transform: `translateX(-${activePhotoIndex * 100}%)` }">
-            <template v-for="(photo, index) in selectedProduct.photos" :key="`${selectedProduct.slug}-${index}`">
-              <img
-                v-if="/^https?:\/\//i.test(String(photo))"
-                class="product-visual product-image"
-                :src="withFallbackImage(photo)"
-                :alt="`${selectedProduct.title} image ${index + 1}`"
-                :loading="index === 0 ? 'eager' : 'lazy'"
-                decoding="async"
-                @error="applyImageFallback"
-              />
-              <div
-                v-else
-                class="product-visual"
-                :style="selectedProduct.visualStyles[index]"
-                role="img"
-                :aria-label="`${selectedProduct.title} image ${index + 1}`"
-              ></div>
+          <div
+            class="visual-track"
+            :style="{ transform: `translateX(-${activePhotoIndex * 100}%)` }"
+          >
+            <template
+              v-for="(photo, index) in selectedProduct.photos"
+              :key="`${selectedProduct.slug}-${index}`"
+            >
+              <div class="visual-slide">
+                <img
+                  v-if="isUrl(photo) && !hasPhotoFailed(index)"
+                  class="product-visual product-image"
+                  :src="getPhotoSrc(photo, index)"
+                  :alt="`${selectedProduct.title} image ${index + 1}`"
+                  :loading="index === 0 ? 'eager' : 'lazy'"
+                  decoding="async"
+                  @error="handleProductImageError(index, $event)"
+                />
+                <!-- Fallback: CSS gradient swatch when photo failed or not a URL -->
+                <div
+                  v-else
+                  class="product-visual"
+                  :style="selectedProduct.visualStyles[index]"
+                  role="img"
+                  :aria-label="`${selectedProduct.title} image ${index + 1}`"
+                ></div>
+                <div v-if="hasPhotoFailed(index) && isUrl(photo)" class="image-recovery-actions">
+                  <button
+                    type="button"
+                    class="retry-btn"
+                    @click="retryPhoto(index)"
+                  >
+                    Retry Image
+                  </button>
+                  <button
+                    type="button"
+                    class="offline-download-btn"
+                    @click="downloadPhoto(photo, index)"
+                  >
+                    Download Offline
+                  </button>
+                </div>
+              </div>
             </template>
           </div>
         </div>
+
         <button
           v-if="selectedProduct.photos.length > 1"
           class="gallery-btn prev"
@@ -68,7 +103,12 @@
         >
           &#8250;
         </button>
-        <div v-if="selectedProduct.photos.length > 1" class="gallery-thumbs" aria-label="Product image thumbnails">
+
+        <div
+          v-if="selectedProduct.photos.length > 1"
+          class="gallery-thumbs"
+          aria-label="Product image thumbnails"
+        >
           <button
             v-for="(photo, index) in selectedProduct.photos"
             :key="`thumb-${index}`"
@@ -79,15 +119,19 @@
             @click="activePhotoIndex = index"
           >
             <img
-              v-if="/^https?:\/\//i.test(String(photo))"
+              v-if="isUrl(photo) && !hasPhotoFailed(index)"
               class="gallery-thumb-image"
-              :src="withFallbackImage(photo)"
+              :src="getPhotoSrc(photo, index)"
               :alt="`${selectedProduct.title} thumbnail ${index + 1}`"
               loading="lazy"
               decoding="async"
-              @error="applyImageFallback"
+              @error="handleThumbError(index, $event)"
             />
-            <span v-else class="gallery-thumb-image" :style="selectedProduct.visualStyles[index]"></span>
+            <span
+              v-else
+              class="gallery-thumb-image"
+              :style="selectedProduct.visualStyles[index]"
+            ></span>
           </button>
         </div>
       </div>
@@ -95,14 +139,19 @@
       <article class="product-content">
         <p class="category">{{ selectedProduct.category }}</p>
         <h1>{{ selectedProduct.title }}</h1>
+
         <div class="attention-row">
           <span v-if="selectedProduct.hasDiscount" class="attention-pill subtle">
             {{ selectedProduct.discountPercent }}% off
           </span>
-          <span v-if="!selectedProduct.isOutOfStock && selectedProduct.stockCount <= 3" class="attention-pill scarce">
+          <span
+            v-if="!selectedProduct.isOutOfStock && selectedProduct.stockCount <= 3"
+            class="attention-pill scarce"
+          >
             Limited design drop
           </span>
         </div>
+
         <div class="price-block">
           <div class="main-price">
             <p v-if="selectedProduct.hasDiscount" class="price-headline">
@@ -123,10 +172,14 @@
             </div>
           </div>
         </div>
+
         <p
           v-if="selectedProduct.isOutOfStock || selectedProduct.stockCount <= 3"
           class="stock-state"
-          :class="{ sold: selectedProduct.isOutOfStock, scarce: !selectedProduct.isOutOfStock && selectedProduct.stockCount === 1 }"
+          :class="{
+            sold: selectedProduct.isOutOfStock,
+            scarce: !selectedProduct.isOutOfStock && selectedProduct.stockCount === 1,
+          }"
         >
           {{
             selectedProduct.isOutOfStock
@@ -136,17 +189,20 @@
                 : `${selectedProduct.stockCount} left in stock`
           }}
         </p>
-        <p v-if="!selectedProduct.isOutOfStock && selectedProduct.stockCount <= 3" class="scarcity-copy">
+        <p
+          v-if="!selectedProduct.isOutOfStock && selectedProduct.stockCount <= 3"
+          class="scarcity-copy"
+        >
           {{
             selectedProduct.stockCount === 1
               ? 'This Bandhani design is nearly sold out and may not be restocked in the same pattern.'
               : `This Bandhani design is part of a limited batch. Only ${selectedProduct.stockCount} pieces remain in this drop.`
           }}
         </p>
-        
+
         <ul class="points inline-points" v-if="descriptionPoints.length">
           <li v-for="(point, index) in descriptionPoints" :key="index">
-            <span class="bullet-icon" aria-hidden="true">*</span>
+            <span class="bullet-icon" aria-hidden="true">✦</span>
             {{ point }}
           </li>
         </ul>
@@ -154,36 +210,31 @@
         <section class="detail-card heritage-card" aria-labelledby="bandhani-story-title">
           <h2 id="bandhani-story-title">About Bandhani</h2>
           <p>
-            Bandhani is a traditional tie-dye textile art from Gujarat and Rajasthan, created by carefully tying tiny
-            points on fabric before dyeing to reveal intricate dotted patterns.
+            Bandhani is a traditional tie-dye textile art from Gujarat and Rajasthan, created by
+            carefully tying tiny points on fabric before dyeing to reveal intricate dotted patterns.
           </p>
           <p>
-            Each piece carries the quiet character of handcrafted work, with subtle variations that make every drape
-            feel personal and refined.
+            Each piece carries the quiet character of handcrafted work, with subtle variations that
+            make every drape feel personal and refined.
           </p>
         </section>
-
-        <!--
-        <section class="detail-card packaging-card" aria-labelledby="packaging-title">
-          <h2 id="packaging-title">Packaging & Gifting</h2>
-          <p>
-            Your order is presented in a practical plastic jar that keeps the fabric protected and neatly stored,
-            while also making it suitable for gifting.
-          </p>
-        </section>
-        -->
-
-        <ul class="points" v-if="descriptionPoints.length">
-          <li v-for="(point, index) in descriptionPoints" :key="index">
-            <span class="bullet-icon" aria-hidden="true">✦</span>
-            {{ point }}
-          </li>
-        </ul>
 
         <div class="cta-row">
-          <button type="button" class="btn add" :disabled="selectedProduct.isOutOfStock" @click="handleAddToCart">Add to Cart</button>
-          <button type="button" class="btn buy" :disabled="isBuyingNow || selectedProduct.isOutOfStock" @click="handleBuyNow">
-            {{ isBuyingNow ? 'Opening UPI...' : 'Buy Now' }}
+          <button
+            type="button"
+            class="btn add"
+            :disabled="selectedProduct.isOutOfStock"
+            @click="handleAddToCart"
+          >
+            Add to Cart
+          </button>
+          <button
+            type="button"
+            class="btn buy"
+            :disabled="isBuyingNow || selectedProduct.isOutOfStock"
+            @click="handleBuyNow"
+          >
+            {{ isBuyingNow ? 'Opening...' : 'Buy Now' }}
           </button>
         </div>
       </article>
@@ -204,7 +255,12 @@
             decoding="async"
             @error="applyImageFallback"
           />
-          <div v-else class="mini-swatch" :style="item.visualStyles[0] || { background: item.gradient }" aria-hidden="true"></div>
+          <div
+            v-else
+            class="mini-swatch"
+            :style="item.visualStyles[0] || { background: item.gradient }"
+            aria-hidden="true"
+          ></div>
           <p>{{ item.title }}</p>
           <strong>{{ item.price }}</strong>
           <span v-if="item.hasDiscount" class="related-prev-price">{{ item.basePrice }}</span>
@@ -216,15 +272,21 @@
     <section v-if="!loading && !selectedProduct" class="empty-product">
       <h2>Product Not Found</h2>
       <p>
-        This product is not available or the link is invalid. Explore our collection to discover handcrafted Bandhani
-        pieces.
+        This product is not available or the link is invalid. Explore our collection to discover
+        handcrafted Bandhani pieces.
       </p>
       <a :href="explorePath">Go to Explore Collection</a>
     </section>
 
-    <div v-if="paymentSheet" class="payment-sheet-backdrop" @click.self="closePaymentSheet">
+    <div
+      v-if="paymentSheet"
+      class="payment-sheet-backdrop"
+      @click.self="closePaymentSheet"
+    >
       <section class="payment-sheet">
-        <h2>{{ paymentSheet.mobileDevice ? 'Complete UPI Payment' : 'UPI App Not Configured' }}</h2>
+        <h2>
+          {{ paymentSheet.mobileDevice ? 'Complete UPI Payment' : 'UPI App Not Configured' }}
+        </h2>
         <p class="payment-copy">
           {{
             paymentSheet.mobileDevice
@@ -232,12 +294,23 @@
               : 'No UPI payment app is configured on this device. Configure a UPI app first, or use these details in any UPI app on your phone.'
           }}
         </p>
-        <p class="payment-row"><span>UPI ID</span><strong>{{ paymentSheet.upiId }}</strong></p>
-        <p class="payment-row"><span>Amount</span><strong>{{ formatInr(paymentSheet.amount) }}</strong></p>
-        <p class="payment-row"><span>Order Ref</span><strong>{{ paymentSheet.orderRef }}</strong></p>
+        <p class="payment-row">
+          <span>UPI ID</span><strong>{{ paymentSheet.upiId }}</strong>
+        </p>
+        <p class="payment-row">
+          <span>Amount</span><strong>{{ formatInr(paymentSheet.amount) }}</strong>
+        </p>
+        <p class="payment-row">
+          <span>Order Ref</span><strong>{{ paymentSheet.orderRef }}</strong>
+        </p>
         <div class="payment-actions">
           <button type="button" class="btn buy" @click="copyPaymentDetails">Copy Details</button>
-          <button v-if="paymentSheet.mobileDevice" type="button" class="btn add" @click="openUpiApp">
+          <button
+            v-if="paymentSheet.mobileDevice"
+            type="button"
+            class="btn add"
+            @click="openUpiApp"
+          >
             Try Opening App Again
           </button>
           <button type="button" class="btn add" @click="closePaymentSheet">Close</button>
@@ -252,13 +325,21 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useHead } from '@unhead/vue'
-import { addCartItem, buyNow, fetchCart, fetchProducts } from '../api/products'
+import { addCartItem, buyNow, fetchCart, fetchProductBySlug, fetchProducts } from '../api/products'
 import { applyImageFallback, DEFAULT_PRODUCT_IMAGE, withFallbackImage } from '../utils/imageFallback'
 import { setCartCount } from '../utils/cartStore'
-import { buildCartPath, buildExplorePath, buildProductPath, buildProfilePath, getCurrentProductSlug, replaceWithPath } from '../utils/routes'
+import {
+  buildCartPath,
+  buildExplorePath,
+  buildProductPath,
+  buildProfilePath,
+  getCurrentProductSlug,
+  replaceWithPath,
+} from '../utils/routes'
 import ProductReviews from './ProductReviews.vue'
 import SiteFooter from './SiteFooter.vue'
 
+// ─── State ───────────────────────────────────────────────────────────────────
 const activePhotoIndex = ref(0)
 const cartCount = ref(0)
 const explorePath = buildExplorePath()
@@ -272,26 +353,49 @@ const selectedProduct = ref(null)
 const allProducts = ref([])
 const isBuyingNow = ref(false)
 const paymentSheet = ref(null)
-let toastTimer
+
+// failedPhotoIndexes: { [index]: true }
+const failedPhotoIndexes = ref({})
+
+// photoSrcOverrides: { [index]: freshUrl } — used after a successful refresh
+const photoSrcOverrides = ref({})
+
+let toastTimer = null
+let imageRefreshTimer = null
+// Track ongoing refresh to avoid duplicate calls
+let isRefreshing = false
 
 const selectedSlug = getCurrentProductSlug()
 
+// ─── Route guards ─────────────────────────────────────────────────────────────
 if (!selectedSlug) {
   window.location.href = '/'
 }
 
-if (typeof window !== 'undefined' && window.location.pathname.toLowerCase() === '/product' && selectedSlug) {
+if (
+  typeof window !== 'undefined' &&
+  window.location.pathname.toLowerCase() === '/product' &&
+  selectedSlug
+) {
   replaceWithPath(buildProductPath(selectedSlug))
 }
 
+// ─── SEO ─────────────────────────────────────────────────────────────────────
 useHead(() => {
   const product = selectedProduct.value
-  const title = product?.title ? `${product.title} | Heritage Hues` : 'Bandhani Product | Heritage Hues'
+  const title = product?.title
+    ? `${product.title} | Heritage Hues`
+    : 'Bandhani Product | Heritage Hues'
   const description = product?.description
     ? `${product.description}`.slice(0, 160)
     : 'Discover premium handcrafted Bandhani sarees with secure checkout, inclusive pricing, and artisan-led design.'
-  const canonicalPath = product?.slug ? buildProductPath(product.slug) : `/product/${encodeURIComponent(selectedSlug || '')}`
-  const image = new URL(withFallbackImage(product?.primaryPhoto || DEFAULT_PRODUCT_IMAGE), window.location.origin).toString()
+  const canonicalPath = product?.slug
+    ? buildProductPath(product.slug)
+    : `/product/${encodeURIComponent(selectedSlug || '')}`
+  const image = new URL(
+    withFallbackImage(product?.primaryPhoto || DEFAULT_PRODUCT_IMAGE),
+    window.location.origin,
+  ).toString()
 
   return {
     title,
@@ -311,17 +415,143 @@ useHead(() => {
   }
 })
 
+// ─── Computed ─────────────────────────────────────────────────────────────────
 const relatedProducts = computed(() => {
   if (!selectedProduct.value) return []
-  return allProducts.value.filter((item) => item.slug !== selectedProduct.value.slug).slice(0, 4)
+  return allProducts.value
+    .filter((item) => item.slug !== selectedProduct.value.slug)
+    .slice(0, 4)
 })
 
 const descriptionPoints = computed(() => {
   if (!selectedProduct.value) return []
   const description = String(selectedProduct.value.description || '').trim()
-  const bullets = Array.isArray(selectedProduct.value.bullets) ? selectedProduct.value.bullets : []
+  const bullets = Array.isArray(selectedProduct.value.bullets)
+    ? selectedProduct.value.bullets
+    : []
   return [description, ...bullets].filter(Boolean)
 })
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+/** Check karo ki value ek URL hai */
+const isUrl = (val) => /^https?:\/\//i.test(String(val || ''))
+
+/** Photo src return karo — override (fresh URL) hai toh woh, warna original */
+const getPhotoSrc = (photo, index) => {
+  const override = photoSrcOverrides.value[index]
+  return override || withFallbackImage(photo)
+}
+
+const hasPhotoFailed = (index) => Boolean(failedPhotoIndexes.value[index])
+
+const showToastMessage = (message, duration = 1500) => {
+  toastMessage.value = message
+  showToast.value = true
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => {
+    showToast.value = false
+  }, duration)
+}
+
+// ─── Image Refresh Logic ──────────────────────────────────────────────────────
+/**
+ * Jab bhi koi image fail ho, backend se fresh product data fetch karo.
+ * Yeh CDN/Cloudinary/S3 signed URLs ki expiry problem solve karta hai.
+ * Multiple images ek saath fail ho sakti hain — sirf ek fetch enough hai.
+ */
+const refreshProductImages = async () => {
+  if (isRefreshing) return
+  isRefreshing = true
+
+  try {
+    const [freshProduct, freshProducts] = await Promise.all([
+      fetchProductBySlug(selectedSlug),
+      fetchProducts(),
+    ])
+    if (!freshProduct || !selectedProduct.value) return
+
+    const newOverrides = {}
+    freshProduct.photos.forEach((photo, i) => {
+      if (isUrl(photo)) {
+        newOverrides[i] = photo
+      }
+    })
+    photoSrcOverrides.value = newOverrides
+    failedPhotoIndexes.value = {}
+
+    selectedProduct.value = {
+      ...selectedProduct.value,
+      photos: freshProduct.photos,
+      visualStyles: freshProduct.visualStyles,
+      primaryPhoto: freshProduct.primaryPhoto,
+    }
+
+    allProducts.value = freshProducts
+  } catch {
+    showToastMessage('Unable to refresh image right now')
+  } finally {
+    isRefreshing = false
+  }
+}
+
+const handleProductImageError = (index) => {
+  failedPhotoIndexes.value = { ...failedPhotoIndexes.value, [index]: true }
+  clearTimeout(imageRefreshTimer)
+  imageRefreshTimer = setTimeout(refreshProductImages, 800)
+}
+
+const handleThumbError = (index) => {
+  failedPhotoIndexes.value = { ...failedPhotoIndexes.value, [index]: true }
+  clearTimeout(imageRefreshTimer)
+  imageRefreshTimer = setTimeout(refreshProductImages, 800)
+}
+
+const retryPhoto = (index) => {
+  const newOverrides = { ...photoSrcOverrides.value }
+  delete newOverrides[index]
+  photoSrcOverrides.value = newOverrides
+
+  const newFailed = { ...failedPhotoIndexes.value }
+  delete newFailed[index]
+  failedPhotoIndexes.value = newFailed
+
+  refreshProductImages()
+}
+
+const buildPhotoDownloadName = (index, source) => {
+  const slug = selectedProduct.value?.slug || 'heritage-hues-product'
+  const match = String(source || '').match(/\.([a-z0-9]+)(?:[?#].*)?$/i)
+  const extension = match?.[1] || 'jpg'
+  return `${slug}-image-${index + 1}.${extension}`
+}
+
+const triggerBrowserDownload = (href, filename) => {
+  const link = document.createElement('a')
+  link.href = href
+  link.download = filename
+  link.rel = 'noopener'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
+const downloadPhoto = async (photo, index) => {
+  const source = getPhotoSrc(photo, index)
+  if (!source || !isUrl(source)) return
+
+  try {
+    const response = await fetch(source, { cache: 'no-store' })
+    if (!response.ok) throw new Error('Download request failed')
+    const blob = await response.blob()
+    const objectUrl = URL.createObjectURL(blob)
+    triggerBrowserDownload(objectUrl, buildPhotoDownloadName(index, source))
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 0)
+    showToastMessage('Image download started')
+  } catch {
+    window.open(source, '_blank', 'noopener')
+    showToastMessage('Opened image in a new tab for manual download')
+  }
+}
 
 const prevPhoto = () => {
   if (!selectedProduct.value) return
@@ -335,11 +565,11 @@ const nextPhoto = () => {
   activePhotoIndex.value = (activePhotoIndex.value + 1) % total
 }
 
+// ─── Cart ─────────────────────────────────────────────────────────────────────
 const handleAddToCart = () => {
   if (!selectedProduct.value) return
   if (selectedProduct.value.isOutOfStock) {
-    toastMessage.value = `${selectedProduct.value.title} is out of stock`
-    showToast.value = true
+    showToastMessage(`${selectedProduct.value.title} is out of stock`)
     return
   }
   addCartItem({ slug: selectedProduct.value.slug, quantity: 1 })
@@ -349,81 +579,11 @@ const handleAddToCart = () => {
         : 0
       setCartCount(count)
       cartCount.value = count
-      toastMessage.value = `${selectedProduct.value.title} added to cart`
-      showToast.value = true
-      clearTimeout(toastTimer)
-      toastTimer = setTimeout(() => {
-        showToast.value = false
-      }, 1400)
+      showToastMessage(`${selectedProduct.value.title} added to cart`, 1400)
     })
     .catch((err) => {
       error.value = err.message || 'Unable to add product to cart'
     })
-}
-
-const formatInr = (value) =>
-  new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(value)
-
-const isMobileDevice = () => /Android|iPhone|iPad|iPod/i.test(window.navigator.userAgent || '')
-
-const launchUpi = (upiUrl) => {
-  window.location.href = upiUrl
-}
-
-const closePaymentSheet = () => {
-  paymentSheet.value = null
-}
-
-const copyPaymentDetails = async () => {
-  if (!paymentSheet.value) return
-
-  const text = [
-    `UPI ID: ${paymentSheet.value.upiId}`,
-    `Amount: ${formatInr(paymentSheet.value.amount)}`,
-    `Order Ref: ${paymentSheet.value.orderRef}`,
-    `UPI Link: ${paymentSheet.value.upiUrl}`,
-  ].join('\n')
-
-  try {
-    await navigator.clipboard.writeText(text)
-    toastMessage.value = 'Payment details copied'
-    showToast.value = true
-    clearTimeout(toastTimer)
-    toastTimer = setTimeout(() => {
-      showToast.value = false
-    }, 1500)
-  } catch {
-    toastMessage.value = 'Unable to copy payment details'
-    showToast.value = true
-  }
-}
-
-const openUpiApp = () => {
-  if (!paymentSheet.value?.upiUrl) return
-  launchUpi(paymentSheet.value.upiUrl)
-}
-
-const handleBuyNow = async () => {
-  if (!selectedProduct.value) return
-  if (selectedProduct.value.isOutOfStock) {
-    error.value = `${selectedProduct.value.title} is out of stock`
-    return
-  }
-
-  isBuyingNow.value = true
-  error.value = ''
-
-  try {
-    const response = await buyNow({ slug: selectedProduct.value.slug, quantity: 1 })
-    if (!response?.checkout_url) {
-      throw new Error('Checkout could not be started')
-    }
-    window.location.href = response.checkout_url
-  } catch (err) {
-    error.value = err.message || 'Unable to start checkout'
-  } finally {
-    isBuyingNow.value = false
-  }
 }
 
 const syncCartCount = () => {
@@ -440,12 +600,73 @@ const syncCartCount = () => {
     })
 }
 
+// ─── Payment / Buy Now ────────────────────────────────────────────────────────
+const formatInr = (value) =>
+  new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(value)
+
+const closePaymentSheet = () => {
+  paymentSheet.value = null
+}
+
+const copyPaymentDetails = async () => {
+  if (!paymentSheet.value) return
+  const text = [
+    `UPI ID: ${paymentSheet.value.upiId}`,
+    `Amount: ${formatInr(paymentSheet.value.amount)}`,
+    `Order Ref: ${paymentSheet.value.orderRef}`,
+    `UPI Link: ${paymentSheet.value.upiUrl}`,
+  ].join('\n')
+  try {
+    await navigator.clipboard.writeText(text)
+    showToastMessage('Payment details copied')
+  } catch {
+    showToastMessage('Unable to copy payment details')
+  }
+}
+
+const openUpiApp = () => {
+  if (!paymentSheet.value?.upiUrl) return
+  window.location.href = paymentSheet.value.upiUrl
+}
+
+const handleBuyNow = async () => {
+  if (!selectedProduct.value) return
+  if (selectedProduct.value.isOutOfStock) {
+    error.value = `${selectedProduct.value.title} is out of stock`
+    return
+  }
+  isBuyingNow.value = true
+  error.value = ''
+  try {
+    const response = await buyNow({ slug: selectedProduct.value.slug, quantity: 1 })
+    if (!response?.checkout_url) throw new Error('Checkout could not be started')
+    window.location.href = response.checkout_url
+  } catch (err) {
+    error.value = err.message || 'Unable to start checkout'
+  } finally {
+    isBuyingNow.value = false
+  }
+}
+
+// ─── Load Product ─────────────────────────────────────────────────────────────
 const loadProduct = async () => {
   loading.value = true
   error.value = ''
+  failedPhotoIndexes.value = {}
+  photoSrcOverrides.value = {}
+  activePhotoIndex.value = 0
   try {
-    allProducts.value = await fetchProducts()
-    selectedProduct.value = allProducts.value.find((item) => item.slug === selectedSlug) || null
+    const [product, products] = await Promise.all([
+      fetchProductBySlug(selectedSlug),
+      fetchProducts(),
+    ])
+    allProducts.value = products
+    selectedProduct.value =
+      product || allProducts.value.find((item) => item.slug === selectedSlug) || null
     if (!selectedProduct.value) {
       window.location.replace('/')
       return
@@ -457,6 +678,7 @@ const loadProduct = async () => {
   }
 }
 
+// ─── Lifecycle ────────────────────────────────────────────────────────────────
 onMounted(() => {
   syncCartCount()
   loadProduct()
@@ -466,12 +688,14 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('cart-updated', syncCartCount)
   clearTimeout(toastTimer)
+  clearTimeout(imageRefreshTimer)
 })
 </script>
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:wght@400;500;600&display=swap");
 
+/* ── Base ─────────────────────────────────────────────────────────────────── */
 .product-page {
   min-height: 100svh;
   padding: clamp(1rem, 2.6vw, 2rem) clamp(1rem, 4vw, 3rem) clamp(2rem, 6vw, 4rem);
@@ -491,6 +715,7 @@ onBeforeUnmount(() => {
   color: #8f2519;
 }
 
+/* ── Toast ───────────────────────────────────────────────────────────────── */
 .toast {
   position: fixed;
   top: 1rem;
@@ -506,6 +731,7 @@ onBeforeUnmount(() => {
   font-size: 0.82rem;
 }
 
+/* ── Header ──────────────────────────────────────────────────────────────── */
 .top-row {
   display: flex;
   align-items: center;
@@ -565,6 +791,7 @@ onBeforeUnmount(() => {
   place-items: center;
 }
 
+/* ── Product Hero Grid ───────────────────────────────────────────────────── */
 .product-hero {
   margin-top: 0.9rem;
   border-radius: 20px;
@@ -585,12 +812,7 @@ onBeforeUnmount(() => {
   gap: clamp(0.9rem, 2.4vw, 1.6rem);
 }
 
-.product-content {
-  display: grid;
-  gap: 0.9rem;
-  align-content: start;
-}
-
+/* ── Gallery / Slider ────────────────────────────────────────────────────── */
 .visual-slider {
   position: relative;
   border-radius: 16px;
@@ -641,7 +863,13 @@ onBeforeUnmount(() => {
   transition: transform 320ms ease;
 }
 
+.visual-slide {
+  position: relative;
+  min-width: 100%;
+}
+
 .product-visual {
+  width: 100%;
   min-width: 100%;
   border-radius: 16px;
   min-height: 340px;
@@ -653,6 +881,39 @@ onBeforeUnmount(() => {
   display: block;
 }
 
+/* ── Retry Button (replaces offline-download-btn) ────────────────────────── */
+.image-recovery-actions {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.55rem;
+}
+
+.offline-download-btn,
+.retry-btn {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.6rem 1rem;
+  background: rgba(44, 16, 14, 0.88);
+  color: #fff3df;
+  font-family: "Cinzel", serif;
+  font-size: 0.76rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 12px 24px rgba(32, 9, 11, 0.28);
+  transition: background 180ms ease;
+}
+
+.offline-download-btn:hover,
+.retry-btn:hover {
+  background: rgba(72, 24, 20, 0.96);
+}
+
+/* ── Gallery Controls ────────────────────────────────────────────────────── */
 .gallery-btn {
   position: absolute;
   top: 50%;
@@ -706,6 +967,13 @@ onBeforeUnmount(() => {
   object-fit: cover;
 }
 
+/* ── Product Content ──────────────────────────────────────────────────────── */
+.product-content {
+  display: grid;
+  gap: 0.9rem;
+  align-content: start;
+}
+
 .category {
   margin: 0;
   font-family: "Cinzel", serif;
@@ -722,49 +990,13 @@ h1 {
   font-size: clamp(1.8rem, 3.8vw, 2.7rem);
 }
 
-.price {
+h2 {
   margin: 0;
-  color: #fff4de;
   font-family: "Cinzel", serif;
-  font-size: clamp(1.95rem, 4vw, 2.4rem);
-  font-weight: 700;
-  line-height: 1;
+  color: #5f2215;
 }
 
-.main-price {
-  display: flex;
-  flex-direction: column;
-  gap: 0.42rem;
-}
-
-.main-price small {
-  font-size: 0.88rem;
-  color: rgba(255, 234, 201, 0.88);
-  font-style: normal;
-  letter-spacing: 0.02em;
-}
-
-.bullet-icon {
-  color: #cf9f64;
-  margin-right: 0.5rem;
-  font-size: 0.9em;
-}
-
-.price-block {
-  border-radius: 18px;
-  padding: 1rem 1.05rem;
-  background:
-    linear-gradient(145deg, rgba(71, 16, 18, 0.96), rgba(43, 10, 14, 0.94)),
-    radial-gradient(circle at top right, rgba(207, 159, 100, 0.18), transparent 44%);
-  border: 1px solid rgba(207, 159, 100, 0.28);
-  box-shadow: 0 16px 28px rgba(32, 9, 11, 0.22);
-}
-
-.purchase-panel {
-  display: grid;
-  gap: 0.75rem;
-}
-
+/* ── Attention Pills ─────────────────────────────────────────────────────── */
 .attention-row {
   margin-top: 0.8rem;
   display: flex;
@@ -796,6 +1028,30 @@ h1 {
   border-color: rgba(124, 46, 27, 0.2);
 }
 
+/* ── Price Block ─────────────────────────────────────────────────────────── */
+.price-block {
+  border-radius: 18px;
+  padding: 1rem 1.05rem;
+  background:
+    linear-gradient(145deg, rgba(71, 16, 18, 0.96), rgba(43, 10, 14, 0.94)),
+    radial-gradient(circle at top right, rgba(207, 159, 100, 0.18), transparent 44%);
+  border: 1px solid rgba(207, 159, 100, 0.28);
+  box-shadow: 0 16px 28px rgba(32, 9, 11, 0.22);
+}
+
+.main-price {
+  display: flex;
+  flex-direction: column;
+  gap: 0.42rem;
+}
+
+.main-price small {
+  font-size: 0.88rem;
+  color: rgba(255, 234, 201, 0.88);
+  font-style: normal;
+  letter-spacing: 0.02em;
+}
+
 .price-headline {
   margin: 0;
   display: flex;
@@ -804,10 +1060,13 @@ h1 {
   flex-wrap: wrap;
 }
 
-.prev-price {
-  color: rgba(255, 226, 188, 0.72);
-  text-decoration: line-through;
-  font-size: 1.02rem;
+.price {
+  margin: 0;
+  color: #fff4de;
+  font-family: "Cinzel", serif;
+  font-size: clamp(1.95rem, 4vw, 2.4rem);
+  font-weight: 700;
+  line-height: 1;
 }
 
 .discount-chip {
@@ -833,17 +1092,18 @@ h1 {
   letter-spacing: 0.08em;
 }
 
+.prev-price {
+  color: rgba(255, 226, 188, 0.72);
+  text-decoration: line-through;
+  font-size: 1.02rem;
+}
+
 .price-notes {
   display: grid;
   gap: 0.14rem;
 }
 
-.status-panel {
-  display: grid;
-  gap: 0.18rem;
-  padding-top: 0.15rem;
-}
-
+/* ── Stock ───────────────────────────────────────────────────────────────── */
 .stock-state {
   margin: 0.45rem 0 0;
   color: #7a2f1e;
@@ -867,6 +1127,32 @@ h1 {
   line-height: 1.4;
 }
 
+/* ── Description Points ──────────────────────────────────────────────────── */
+.bullet-icon {
+  color: #cf9f64;
+  margin-right: 0.5rem;
+  font-size: 0.9em;
+  flex-shrink: 0;
+}
+
+.inline-points {
+  margin: 0.4rem 0 0;
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem;
+}
+
+.inline-points li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  color: #4f3026;
+  line-height: 1.6;
+}
+
+/* ── Heritage / Detail Cards ─────────────────────────────────────────────── */
 .detail-card {
   margin-top: 0.85rem;
   border-radius: 16px;
@@ -877,7 +1163,6 @@ h1 {
 }
 
 .detail-card h2 {
-  margin: 0;
   font-size: 1rem;
   color: #5f2215;
 }
@@ -888,66 +1173,11 @@ h1 {
   line-height: 1.7;
 }
 
-.detail-card.compact {
-  margin-top: 0.6rem;
-  padding: 0.75rem 0.9rem;
-}
-
-.inline-points {
-  margin-top: 0.1rem;
-  padding-left: 0;
-  list-style: none;
-}
-
-.inline-points li {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.6rem;
-  color: #4f3026;
-  line-height: 1.6;
-}
-
-.inline-points li + li {
-  margin-top: 0.38rem;
-}
-
-.points:not(.inline-points) {
-  display: none;
-}
-
-.content-grid {
-  display: grid;
-  gap: 0.85rem;
-}
-
-.story-card {
-  background: linear-gradient(180deg, rgba(255, 249, 239, 0.88), rgba(255, 244, 227, 0.8));
-}
-
-.purchase-cta {
-  margin-top: 0.1rem;
-}
-
-.heritage-card,
-.packaging-card {
+.heritage-card {
   background: rgba(255, 252, 246, 0.5);
 }
 
-.packaging-card p,
-.heritage-card p {
-  max-width: 60ch;
-}
-
-.points {
-  margin: 0.8rem 0 0;
-  padding-left: 1.2rem;
-  line-height: 1.5;
-}
-
-.points li + li {
-  margin-top: 0.3rem;
-}
-
+/* ── CTA ─────────────────────────────────────────────────────────────────── */
 .cta-row {
   display: flex;
   flex-wrap: wrap;
@@ -961,6 +1191,7 @@ h1 {
   font-family: "Cinzel", serif;
   padding: 0.45rem 1rem;
   cursor: pointer;
+  transition: opacity 180ms ease;
 }
 
 .btn.add {
@@ -974,45 +1205,13 @@ h1 {
 }
 
 .btn:disabled {
-  opacity: 0.75;
-  cursor: wait;
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
+/* ── Related ─────────────────────────────────────────────────────────────── */
 .related {
   margin-top: 1.3rem;
-}
-
-.empty-product {
-  flex: 1;
-  display: grid;
-  place-content: center;
-  justify-items: start;
-  gap: 0.5rem;
-  text-align: left;
-}
-
-.empty-product h2 {
-  margin: 0;
-  color: #5f2215;
-}
-
-.empty-product p {
-  margin: 0;
-  max-width: 62ch;
-  color: #482820;
-}
-
-.empty-product a {
-  margin-top: 0.2rem;
-  color: #6f2a1d;
-  text-decoration: none;
-  font-family: "Cinzel", serif;
-}
-
-h2 {
-  margin: 0;
-  font-family: "Cinzel", serif;
-  color: #5f2215;
 }
 
 .related-row {
@@ -1068,36 +1267,34 @@ h2 {
   text-decoration: none;
 }
 
-.site-footer {
-  margin-top: 1.4rem;
-  border-top: 1px solid rgba(131, 62, 37, 0.3);
-  padding-top: 0.9rem;
+/* ── Empty State ─────────────────────────────────────────────────────────── */
+.empty-product {
+  flex: 1;
+  display: grid;
+  place-content: center;
+  justify-items: start;
+  gap: 0.5rem;
 }
 
-.site-footer p {
+.empty-product h2 {
   margin: 0;
-  font-family: "Cinzel", serif;
-  color: #5e2619;
+  color: #5f2215;
 }
 
-.site-footer nav {
-  margin-top: 0.45rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
+.empty-product p {
+  margin: 0;
+  max-width: 62ch;
+  color: #482820;
 }
 
-.site-footer nav a {
+.empty-product a {
+  margin-top: 0.2rem;
+  color: #6f2a1d;
   text-decoration: none;
-  color: #7b3523;
+  font-family: "Cinzel", serif;
 }
 
-.site-footer small {
-  margin-top: 0.55rem;
-  display: block;
-  color: #714131;
-}
-
+/* ── Payment Sheet ───────────────────────────────────────────────────────── */
 .payment-sheet-backdrop {
   position: fixed;
   inset: 0;
@@ -1115,11 +1312,6 @@ h2 {
   background: rgba(255, 245, 229, 0.98);
   padding: 1rem;
   box-shadow: 0 18px 30px rgba(33, 14, 10, 0.22);
-}
-
-.payment-sheet h2 {
-  margin: 0;
-  color: #5f2215;
 }
 
 .payment-copy {
@@ -1151,6 +1343,7 @@ h2 {
   gap: 0.6rem;
 }
 
+/* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .product-hero {
     grid-template-columns: minmax(0, 1fr);

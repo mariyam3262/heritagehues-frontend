@@ -67,10 +67,52 @@ const isAbsoluteUrl = (value = '') => /^https?:\/\//i.test(String(value || ''))
 
 const isUploadPath = (value = '') => String(value || '').startsWith('/api/uploads/')
 
+const SIGNED_QUERY_KEYS = new Set([
+  'token',
+  'signature',
+  'sig',
+  'expires',
+  'x-amz-algorithm',
+  'x-amz-credential',
+  'x-amz-date',
+  'x-amz-expires',
+  'x-amz-security-token',
+  'x-amz-signature',
+  'x-amz-signedheaders',
+  'awsaccesskeyid',
+])
+
+const normalizeSignedAssetUrl = (value = '') => {
+  const source = String(value || '').trim()
+  if (!source || !isAbsoluteUrl(source)) return source
+
+  try {
+    const url = new URL(source)
+
+    if (url.pathname.includes('/storage/v1/object/sign/')) {
+      url.pathname = url.pathname.replace('/storage/v1/object/sign/', '/storage/v1/object/public/')
+      url.search = ''
+      return url.toString()
+    }
+
+    url.pathname = url.pathname.replace(/\/s--[^/]+--\//, '/')
+
+    for (const key of [...url.searchParams.keys()]) {
+      if (SIGNED_QUERY_KEYS.has(key.toLowerCase())) {
+        url.searchParams.delete(key)
+      }
+    }
+
+    return url.toString()
+  } catch {
+    return source
+  }
+}
+
 const resolveAssetUrl = (value = '') => {
   const source = String(value || '').trim()
   if (!source) return ''
-  if (isAbsoluteUrl(source)) return source
+  if (isAbsoluteUrl(source)) return normalizeSignedAssetUrl(source)
   if (isUploadPath(source)) {
     if (!IMAGE_BASE) return source
     return new URL(source, `${IMAGE_BASE.replace(/\/+$/, '')}/`).toString()
@@ -135,7 +177,7 @@ const mapProduct = (item = {}) => {
 }
 
 const request = async (path, options = {}) => {
-  const { headers: customHeaders = {}, ...restOptions } = options
+  const { headers: customHeaders = {}, cache = 'no-store', ...restOptions } = options
   const headers = {
     'Content-Type': 'application/json',
     'X-Session-Id': getSessionId(),
@@ -147,6 +189,7 @@ const request = async (path, options = {}) => {
 
   const response = await fetch(`${API_BASE}${path}`, {
     ...restOptions,
+    cache,
     headers,
   })
 
