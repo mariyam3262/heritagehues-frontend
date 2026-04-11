@@ -496,14 +496,10 @@ const refreshProductImages = async () => {
 
 const handleProductImageError = (index) => {
   failedPhotoIndexes.value = { ...failedPhotoIndexes.value, [index]: true }
-  clearTimeout(imageRefreshTimer)
-  imageRefreshTimer = setTimeout(refreshProductImages, 800)
 }
 
 const handleThumbError = (index) => {
   failedPhotoIndexes.value = { ...failedPhotoIndexes.value, [index]: true }
-  clearTimeout(imageRefreshTimer)
-  imageRefreshTimer = setTimeout(refreshProductImages, 800)
 }
 
 const retryPhoto = (index) => {
@@ -688,7 +684,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('cart-updated', syncCartCount)
   clearTimeout(toastTimer)
-  clearTimeout(imageRefreshTimer)
 })
 </script>
 
