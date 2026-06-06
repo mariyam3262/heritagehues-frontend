@@ -68,16 +68,27 @@
                   <button
                     type="button"
                     class="retry-btn"
+                    aria-label="Retry image"
+                    title="Retry image"
                     @click="retryPhoto(index)"
                   >
-                    Retry Image
+                    <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M21 12a9 9 0 1 1-3-6.7" />
+                      <path d="M21 4v6h-6" />
+                    </svg>
                   </button>
                   <button
                     type="button"
                     class="offline-download-btn"
+                    aria-label="Download image offline"
+                    title="Download image offline"
                     @click="downloadPhoto(photo, index)"
                   >
-                    Download Offline
+                    <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M12 3v12" />
+                      <path d="M7 10l5 5 5-5" />
+                      <path d="M5 21h14" />
+                    </svg>
                   </button>
                 </div>
               </div>
@@ -224,17 +235,27 @@
             type="button"
             class="btn add"
             :disabled="selectedProduct.isOutOfStock"
+            aria-label="Add to cart"
+            title="Add to cart"
             @click="handleAddToCart"
           >
-            Add to Cart
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6h15l-2 8H8L6 3H3" />
+              <path d="M9 20h.01M18 20h.01" />
+              <path d="M12 10h4M14 8v4" />
+            </svg>
           </button>
           <button
             type="button"
             class="btn buy"
             :disabled="isBuyingNow || selectedProduct.isOutOfStock"
+            :aria-label="isBuyingNow ? 'Opening checkout' : 'Buy now'"
+            :title="isBuyingNow ? 'Opening checkout' : 'Buy now'"
             @click="handleBuyNow"
           >
-            {{ isBuyingNow ? 'Opening...' : 'Buy Now' }}
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" />
+            </svg>
           </button>
         </div>
       </article>
@@ -245,7 +266,13 @@
     <section v-if="relatedProducts.length" class="related" aria-labelledby="related-title">
       <h2 id="related-title">You May Also Like</h2>
       <div class="related-row">
-        <article v-for="item in relatedProducts" :key="item.slug" class="related-card">
+        <a
+          v-for="item in relatedProducts"
+          :key="item.slug"
+          class="related-card"
+          :href="buildProductPath(item.slug)"
+          :aria-label="`View ${item.title}`"
+        >
           <img
             v-if="item.primaryPhoto"
             class="mini-image"
@@ -264,8 +291,7 @@
           <p>{{ item.title }}</p>
           <strong>{{ item.price }}</strong>
           <span v-if="item.hasDiscount" class="related-prev-price">{{ item.basePrice }}</span>
-          <a :href="buildProductPath(item.slug)">View</a>
-        </article>
+        </a>
       </div>
     </section>
 
@@ -304,16 +330,30 @@
           <span>Order Ref</span><strong>{{ paymentSheet.orderRef }}</strong>
         </p>
         <div class="payment-actions">
-          <button type="button" class="btn buy" @click="copyPaymentDetails">Copy Details</button>
+          <button type="button" class="btn buy" aria-label="Copy payment details" title="Copy payment details" @click="copyPaymentDetails">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 8h11v11H8z" />
+              <path d="M5 15H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v1" />
+            </svg>
+          </button>
           <button
             v-if="paymentSheet.mobileDevice"
             type="button"
             class="btn add"
+            aria-label="Try opening UPI app again"
+            title="Try opening UPI app again"
             @click="openUpiApp"
           >
-            Try Opening App Again
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 12a9 9 0 1 1-3-6.7" />
+              <path d="M21 4v6h-6" />
+            </svg>
           </button>
-          <button type="button" class="btn add" @click="closePaymentSheet">Close</button>
+          <button type="button" class="btn add" aria-label="Close payment sheet" title="Close" @click="closePaymentSheet">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       </section>
     </div>
@@ -702,7 +742,9 @@ onBeforeUnmount(() => {
 }
 
 .status-line {
-  margin-top: 1rem;
+  width: 100%;
+  max-width: 1280px;
+  margin: 1rem auto 0;
   color: #5f2215;
 }
 
@@ -728,6 +770,9 @@ onBeforeUnmount(() => {
 
 /* ── Header ──────────────────────────────────────────────────────────────── */
 .top-row {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -788,7 +833,9 @@ onBeforeUnmount(() => {
 
 /* ── Product Hero Grid ───────────────────────────────────────────────────── */
 .product-hero {
-  margin-top: 0.9rem;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0.9rem auto 0;
   border-radius: 20px;
   border: 1px solid rgba(139, 71, 44, 0.28);
   background:
@@ -803,7 +850,8 @@ onBeforeUnmount(() => {
   box-shadow: 0 22px 36px rgba(33, 14, 10, 0.18);
   padding: clamp(1rem, 3vw, 1.8rem);
   display: grid;
-  grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.2fr);
+  grid-template-columns: minmax(320px, 460px) minmax(0, 1fr);
+  align-items: start;
   gap: clamp(0.9rem, 2.4vw, 1.6rem);
 }
 
@@ -866,13 +914,16 @@ onBeforeUnmount(() => {
 .product-visual {
   width: 100%;
   min-width: 100%;
+  aspect-ratio: 4 / 5;
   border-radius: 16px;
-  min-height: 340px;
+  min-height: 0;
+  max-height: 560px;
   border: 1px solid rgba(181, 121, 76, 0.35);
 }
 
 .product-image {
   object-fit: cover;
+  object-position: center top;
   display: block;
 }
 
@@ -891,7 +942,10 @@ onBeforeUnmount(() => {
 .retry-btn {
   border: 0;
   border-radius: 999px;
-  padding: 0.6rem 1rem;
+  width: 2.55rem;
+  min-width: 2.55rem;
+  min-height: 2.35rem;
+  padding: 0;
   background: rgba(44, 16, 14, 0.88);
   color: #fff3df;
   font-family: "Cinzel", serif;
@@ -901,6 +955,8 @@ onBeforeUnmount(() => {
   cursor: pointer;
   box-shadow: 0 12px 24px rgba(32, 9, 11, 0.28);
   transition: background 180ms ease;
+  display: inline-grid;
+  place-items: center;
 }
 
 .offline-download-btn:hover,
@@ -965,8 +1021,9 @@ onBeforeUnmount(() => {
 /* ── Product Content ──────────────────────────────────────────────────────── */
 .product-content {
   display: grid;
-  gap: 0.9rem;
+  gap: 0.75rem;
   align-content: start;
+  max-width: 680px;
 }
 
 .category {
@@ -979,10 +1036,11 @@ onBeforeUnmount(() => {
 }
 
 h1 {
-  margin: 0.45rem 0 0;
+  margin: 0.25rem 0 0;
   font-family: "Cinzel", serif;
   color: #2c1813;
-  font-size: clamp(1.8rem, 3.8vw, 2.7rem);
+  font-size: clamp(1.55rem, 2.4vw, 2.2rem);
+  line-height: 1.1;
 }
 
 h2 {
@@ -993,7 +1051,7 @@ h2 {
 
 /* ── Attention Pills ─────────────────────────────────────────────────────── */
 .attention-row {
-  margin-top: 0.8rem;
+  margin-top: 0.3rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem;
@@ -1025,8 +1083,9 @@ h2 {
 
 /* ── Price Block ─────────────────────────────────────────────────────────── */
 .price-block {
+  max-width: 560px;
   border-radius: 18px;
-  padding: 1rem 1.05rem;
+  padding: 0.9rem 1rem;
   background:
     linear-gradient(145deg, rgba(71, 16, 18, 0.96), rgba(43, 10, 14, 0.94)),
     radial-gradient(circle at top right, rgba(207, 159, 100, 0.18), transparent 44%);
@@ -1041,7 +1100,7 @@ h2 {
 }
 
 .main-price small {
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   color: rgba(255, 234, 201, 0.88);
   font-style: normal;
   letter-spacing: 0.02em;
@@ -1059,7 +1118,7 @@ h2 {
   margin: 0;
   color: #fff4de;
   font-family: "Cinzel", serif;
-  font-size: clamp(1.95rem, 4vw, 2.4rem);
+  font-size: clamp(1.75rem, 3vw, 2.15rem);
   font-weight: 700;
   line-height: 1;
 }
@@ -1067,7 +1126,7 @@ h2 {
 .discount-chip {
   color: #f5b9c2;
   font-family: "Cormorant Garamond", serif;
-  font-size: 1.18rem;
+  font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.04em;
 }
@@ -1180,13 +1239,27 @@ h2 {
 }
 
 .btn {
+  width: 2.75rem;
+  min-width: 2.75rem;
   min-height: 2.5rem;
   border-radius: 999px;
   border: 1px solid rgba(151, 76, 45, 0.55);
   font-family: "Cinzel", serif;
-  padding: 0.45rem 1rem;
+  padding: 0;
   cursor: pointer;
   transition: opacity 180ms ease;
+  display: inline-grid;
+  place-items: center;
+}
+
+.btn-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .btn.add {
@@ -1206,32 +1279,46 @@ h2 {
 
 /* ── Related ─────────────────────────────────────────────────────────────── */
 .related {
-  margin-top: 1.3rem;
+  width: 100%;
+  max-width: 1280px;
+  margin: 1.3rem auto 0;
 }
 
 .related-row {
   margin-top: 0.65rem;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.65rem;
+  gap: 1rem;
 }
 
 .related-card {
   border-radius: 14px;
   border: 1px solid rgba(144, 75, 46, 0.28);
   background: rgba(255, 244, 226, 0.86);
-  padding: 0.65rem;
+  padding: 0.75rem;
+  color: inherit;
+  text-decoration: none;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.related-card:hover,
+.related-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 22px rgba(77, 34, 20, 0.14);
+  outline: none;
 }
 
 .mini-swatch {
-  height: 100px;
+  width: 100%;
+  aspect-ratio: 4 / 5;
   border-radius: 10px;
 }
 
 .mini-image {
   width: 100%;
-  height: 100px;
+  aspect-ratio: 4 / 5;
   object-fit: cover;
+  object-position: center top;
   border-radius: 10px;
   display: block;
 }
@@ -1239,6 +1326,7 @@ h2 {
 .related-card p {
   margin: 0.5rem 0 0;
   color: #43251d;
+  line-height: 1.35;
 }
 
 .related-card strong {
@@ -1253,13 +1341,6 @@ h2 {
   color: #9f786a;
   text-decoration: line-through;
   font-size: 0.86rem;
-}
-
-.related-card a {
-  margin-top: 0.35rem;
-  display: inline-flex;
-  color: #7a2f1e;
-  text-decoration: none;
 }
 
 /* ── Empty State ─────────────────────────────────────────────────────────── */
@@ -1344,12 +1425,26 @@ h2 {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .visual-slider,
+  .product-content {
+    max-width: 620px;
+  }
+
   .related-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 680px) {
+  .product-hero {
+    border-radius: 16px;
+    padding: 0.9rem;
+  }
+
+  .product-visual {
+    max-height: none;
+  }
+
   .product-content {
     gap: 0.75rem;
   }

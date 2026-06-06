@@ -35,10 +35,17 @@
                 }}
               </p>
               <div class="qty-row">
-                <button type="button" @click="decrease(item)">-</button>
+                <button type="button" aria-label="Decrease quantity" title="Decrease quantity" @click="decrease(item)">-</button>
                 <span>{{ item.quantity }}</span>
-                <button type="button" :disabled="item.available_stock <= 0 || item.quantity >= item.available_stock" @click="increase(item)">+</button>
-                <button type="button" class="remove" @click="remove(item.product_id || item.slug)">Remove</button>
+                <button type="button" aria-label="Increase quantity" title="Increase quantity" :disabled="item.available_stock <= 0 || item.quantity >= item.available_stock" @click="increase(item)">+</button>
+                <button type="button" class="remove" aria-label="Remove item" title="Remove item" @click="remove(item.product_id || item.slug)">
+                  <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 6h18" />
+                    <path d="M8 6V4h8v2" />
+                    <path d="M6 6l1 16h10l1-16" />
+                    <path d="M10 11v6M14 11v6" />
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
@@ -51,10 +58,25 @@
           <p class="summary-note">Free Delivery</p>
           <p class="summary-note">Premium Packaging Included</p>
           <p v-if="checkoutError" class="checkout-error">{{ checkoutError }}</p>
-          <button type="button" class="checkout" :disabled="isCheckingOut" @click="handleCheckout">
-            {{ isCheckingOut ? 'Opening Checkout...' : 'Proceed to Checkout' }}
+          <button
+            type="button"
+            class="checkout"
+            :disabled="isCheckingOut"
+            :aria-label="isCheckingOut ? 'Opening checkout' : 'Proceed to checkout'"
+            :title="isCheckingOut ? 'Opening checkout' : 'Proceed to checkout'"
+            @click="handleCheckout"
+          >
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" />
+            </svg>
           </button>
-          <button type="button" class="clear" @click="clearCartItems">Clear Cart</button>
+          <button type="button" class="clear" aria-label="Clear cart" title="Clear cart" @click="clearCartItems">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 6h18" />
+              <path d="M8 6V4h8v2" />
+              <path d="M6 6l1 16h10l1-16" />
+            </svg>
+          </button>
         </aside>
       </section>
 
@@ -174,9 +196,15 @@ onBeforeUnmount(() => {
 
 .cart-content {
   flex: 1;
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
 }
 
 .cart-header {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -286,9 +314,11 @@ onBeforeUnmount(() => {
 }
 
 .qty-row .remove {
-  border-radius: 8px;
-  min-width: auto;
-  padding: 0 0.55rem;
+  width: 2rem;
+  min-width: 2rem;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
 }
 
 .summary {
@@ -317,12 +347,26 @@ onBeforeUnmount(() => {
 
 .checkout,
 .clear {
-  width: 100%;
+  width: 2.65rem;
+  min-width: 2.65rem;
   min-height: 2.35rem;
   border-radius: 999px;
   border: 1px solid rgba(147, 76, 44, 0.45);
   cursor: pointer;
   margin-top: 0.6rem;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+}
+
+.btn-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .checkout {

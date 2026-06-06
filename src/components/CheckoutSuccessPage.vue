@@ -11,18 +11,26 @@
         }}
       </p>
       <p v-if="orderRef" class="order-ref">Order Ref: <strong>{{ orderRef }}</strong></p>
+      <div class="payment-steps" aria-label="Payment process">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span class="active"></span>
+      </div>
       <div class="actions">
         <a :href="explorePath">Continue Shopping</a>
         <a :href="cartPath">View Cart</a>
         <a v-if="orderId" :href="buildOrderPath(orderId)">Track Order</a>
       </div>
     </section>
+    <SiteFooter />
   </main>
 </template>
 
 <script setup>
 import { useSeo } from '../seo'
 import { buildCartPath, buildExplorePath, buildOrderPath, getCurrentCheckoutSuccessOrderId } from '../utils/routes'
+import SiteFooter from './SiteFooter.vue'
 
 const stored = typeof window !== 'undefined'
   ? window.sessionStorage.getItem('heritage_hues_checkout_success')
@@ -57,7 +65,9 @@ useSeo({
 .success-page {
   min-height: 100svh;
   display: grid;
-  place-items: center;
+  align-content: center;
+  justify-items: center;
+  gap: 1rem;
   padding: 1.5rem;
   background: #dcc39a;
 }
@@ -91,6 +101,23 @@ h1 {
   margin: 0.9rem 0 0;
   color: #5b392f;
   line-height: 1.6;
+}
+
+.payment-steps {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.payment-steps span {
+  min-height: 0.42rem;
+  border-radius: 999px;
+  background: linear-gradient(120deg, #a53a2e, #7d231e);
+}
+
+.payment-steps .active {
+  box-shadow: 0 0 0 3px rgba(165, 58, 46, 0.16);
 }
 
 .actions {

@@ -5,6 +5,13 @@
       <h1>Checkout</h1>
     </header>
 
+    <nav class="payment-steps" aria-label="Payment process">
+      <span class="step done">1</span>
+      <span class="step active">2</span>
+      <span class="step" :class="{ active: activeUpiOrder }">3</span>
+      <span class="step">4</span>
+    </nav>
+
     <p v-if="error" class="status error">{{ error }}</p>
     <p v-if="success" class="status success">{{ success }}</p>
 
@@ -19,7 +26,12 @@
           <label>State<input v-model.trim="address.state" required /></label>
           <label>Pincode<input v-model.trim="address.pincode" required /></label>
         </div>
-        <button type="submit" class="secondary">Update Summary</button>
+        <button type="submit" class="secondary icon-action" aria-label="Update summary" title="Update summary">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 12a9 9 0 1 1-3-6.7" />
+            <path d="M21 4v6h-6" />
+          </svg>
+        </button>
       </form>
 
       <aside class="summary-panel">
@@ -44,8 +56,17 @@
               <span>Paytm</span>
             </div>
             <p class="upi-amount">{{ formatInr(summary.total_amount) }}</p>
-            <button type="button" class="pay" :disabled="paying || loading || confirming" @click="startUpiPayment">
-              {{ paying ? 'Preparing UPI...' : 'Pay via UPI' }}
+            <button
+              type="button"
+              class="pay icon-action"
+              :disabled="paying || loading || confirming"
+              :aria-label="paying ? 'Preparing UPI payment' : 'Pay via UPI'"
+              :title="paying ? 'Preparing UPI payment' : 'Pay via UPI'"
+              @click="startUpiPayment"
+            >
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" />
+              </svg>
             </button>
             <p class="upi-copy">After payment, enter transaction ID to confirm your order</p>
             <p class="policy-note"><strong>No Return Policy:</strong> Orders placed on this payment page are non-returnable.</p>
@@ -70,8 +91,18 @@
           <div class="payment-meta">
             <p><span>Order</span><strong>{{ activeUpiOrder.order_ref }}</strong></p>
           </div>
-          <button type="button" class="pay" @click="openUpiAgain">Open UPI App</button>
-          <button type="button" class="secondary subtle" @click="copyUpiDetails">Copy Payment Details</button>
+          <button type="button" class="pay icon-action" aria-label="Open UPI app" title="Open UPI app" @click="openUpiAgain">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 17L17 7" />
+              <path d="M8 7h9v9" />
+            </svg>
+          </button>
+          <button type="button" class="secondary subtle icon-action" aria-label="Copy payment details" title="Copy payment details" @click="copyUpiDetails">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 8h11v11H8z" />
+              <path d="M5 15H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v1" />
+            </svg>
+          </button>
         </div>
 
         <div class="payment-card qr-card">
@@ -86,8 +117,10 @@
       </div>
 
       <div class="confirm-card">
-        <button type="button" class="pay" :disabled="confirming" @click="showTransactionForm = true">
-          I have completed payment
+        <button type="button" class="pay icon-action" :disabled="confirming" aria-label="I have completed payment" title="I have completed payment" @click="showTransactionForm = true">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20 6L9 17l-5-5" />
+          </svg>
         </button>
 
         <form v-if="showTransactionForm" class="transaction-form" @submit.prevent="submitTransactionId">
@@ -95,8 +128,16 @@
             Transaction ID
             <input v-model.trim="transactionId" placeholder="Enter UPI transaction ID" required />
           </label>
-          <button type="submit" class="pay" :disabled="confirming">
-            {{ confirming ? 'Submitting...' : 'Confirm Order' }}
+          <button
+            type="submit"
+            class="pay icon-action"
+            :disabled="confirming"
+            :aria-label="confirming ? 'Submitting transaction ID' : 'Confirm order'"
+            :title="confirming ? 'Submitting transaction ID' : 'Confirm order'"
+          >
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
           </button>
         </form>
       </div>
@@ -284,6 +325,9 @@ onMounted(() => {
 }
 
 .checkout-header {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -295,8 +339,31 @@ onMounted(() => {
   text-decoration: none;
 }
 
+.payment-steps {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0.85rem auto 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.step {
+  min-height: 0.42rem;
+  border-radius: 999px;
+  background: rgba(119, 53, 31, 0.22);
+  color: transparent;
+}
+
+.step.done,
+.step.active {
+  background: linear-gradient(120deg, #a53a2e, #7d231e);
+}
+
 .checkout-layout {
-  margin-top: 1rem;
+  width: 100%;
+  max-width: 1280px;
+  margin: 1rem auto 0;
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.9fr);
   gap: 1rem;
@@ -313,7 +380,9 @@ onMounted(() => {
 }
 
 .payment-panel {
-  margin-top: 1rem;
+  width: 100%;
+  max-width: 1280px;
+  margin: 1rem auto 0;
 }
 
 .field-grid {
@@ -505,6 +574,25 @@ textarea {
   cursor: pointer;
   color: #fff6e7;
   background: linear-gradient(120deg, #a53a2e, #7d231e);
+}
+
+.icon-action {
+  width: 2.65rem;
+  min-width: 2.65rem;
+  min-height: 2.45rem;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+}
+
+.btn-icon {
+  width: 1.12rem;
+  height: 1.12rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .secondary.subtle {

@@ -39,7 +39,13 @@
       <template v-if="isLoggedIn">
         <div class="logged-in-status">
           <p>Signed in as <strong>{{ currentUser.name }}</strong> (<small>{{ currentUser.email }}</small>)</p>
-          <button type="button" class="btn secondary" @click="logout">Sign out</button>
+          <button type="button" class="btn secondary" aria-label="Sign out" title="Sign out" @click="logout">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <path d="M16 17l5-5-5-5" />
+              <path d="M21 12H9" />
+            </svg>
+          </button>
         </div>
 
         <div class="rating-input">
@@ -79,8 +85,10 @@
         <p v-if="submitSuccess" class="status success">{{ submitSuccess }}</p>
 
         <div class="form-actions">
-          <button type="button" class="btn primary" @click="submitReview" :disabled="submitting">
-            Submit Review
+          <button type="button" class="btn primary" aria-label="Submit review" title="Submit review" @click="submitReview" :disabled="submitting">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
           </button>
         </div>
       </template>
@@ -110,8 +118,18 @@
           <p v-if="authError" class="status error">{{ authError }}</p>
 
           <div class="form-actions">
-            <button type="button" class="btn primary" @click="login" :disabled="loggingIn">
-              {{ loggingIn ? 'Signing in...' : 'Continue' }}
+            <button
+              type="button"
+              class="btn primary"
+              :aria-label="loggingIn ? 'Signing in' : 'Continue'"
+              :title="loggingIn ? 'Signing in' : 'Continue'"
+              @click="login"
+              :disabled="loggingIn"
+            >
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 12h14" />
+                <path d="M13 6l6 6-6 6" />
+              </svg>
             </button>
           </div>
         </div>
@@ -325,52 +343,57 @@ watch(
 
 <style scoped>
 .review-panel {
-  margin-top: 2rem;
-  padding: 2rem;
+  width: 100%;
+  max-width: 1280px;
+  margin: 1.3rem auto 0;
+  padding: clamp(1rem, 2vw, 1.35rem);
   background: rgba(255, 247, 233, 0.94);
   border: 1px solid rgba(174, 125, 80, 0.28);
-  border-radius: 24px;
-  box-shadow: 0 20px 45px rgba(79, 36, 22, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 14px 28px rgba(79, 36, 22, 0.08);
 }
 .review-header {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 1.6rem;
+  margin-bottom: 1rem;
 }
 .review-header .eyebrow {
   margin: 0 0 0.25rem;
-  font-size: 0.9rem;
-  letter-spacing: 0.18em;
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #6f3a24;
 }
 .review-header h2 {
   margin: 0;
-  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  font-size: clamp(1.18rem, 1.6vw, 1.45rem);
   color: #3b1f12;
 }
 .review-count {
   color: #8f5034;
   font-weight: 600;
+  margin: 0;
+  font-size: 0.92rem;
 }
 .review-list {
   display: grid;
-  gap: 1.2rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.8rem;
 }
 .review-card {
-  padding: 1.4rem;
+  padding: 1rem;
   background: #fff;
   border: 1px solid rgba(206, 173, 127, 0.35);
-  border-radius: 18px;
+  border-radius: 14px;
 }
 .review-card-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.65rem;
 }
 .review-author {
   margin: 0 0 0.35rem;
@@ -397,14 +420,14 @@ watch(
   font-weight: 600;
 }
 .review-comment {
-  margin: 0 0 0.8rem;
+  margin: 0 0 0.65rem;
   color: #4f3121;
-  line-height: 1.7;
+  line-height: 1.55;
 }
 .review-date {
   margin: 0;
   color: #7a5a45;
-  font-size: 0.92rem;
+  font-size: 0.86rem;
 }
 .review-actions {
   display: flex;
@@ -427,24 +450,24 @@ watch(
   background: rgba(222, 116, 84, 0.16);
 }
 .empty-state {
-  padding: 1.4rem 1rem;
+  padding: 1rem;
   background: rgba(253, 240, 221, 0.8);
-  border-radius: 18px;
+  border-radius: 14px;
   color: #7b512e;
 }
 .review-form-card {
-  margin-top: 2rem;
-  padding: 1.8rem;
+  margin-top: 1rem;
+  padding: clamp(1rem, 2vw, 1.25rem);
   background: rgba(61, 18, 5, 0.03);
   border: 1px solid rgba(174, 117, 76, 0.18);
-  border-radius: 22px;
+  border-radius: 16px;
 }
 .login-card {
   background: #fff;
   border: 1px solid rgba(174, 117, 76, 0.22);
-  border-radius: 22px;
-  padding: 1.5rem;
-  margin-bottom: 1.2rem;
+  border-radius: 14px;
+  padding: 1rem;
+  margin-bottom: 1rem;
 }
 .login-card-header {
   margin-bottom: 0.9rem;
@@ -462,12 +485,13 @@ watch(
   font-size: 1.1rem;
 }
 .login-card-copy {
-  margin: 0 0 1.2rem;
+  margin: 0 0 1rem;
   color: #6a4a37;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 .login-inputs {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
 }
 .login-field {
@@ -480,8 +504,8 @@ watch(
 .login-field input {
   width: 100%;
   border: 1px solid rgba(174, 117, 76, 0.24);
-  border-radius: 14px;
-  padding: 0.95rem 1rem;
+  border-radius: 10px;
+  padding: 0.75rem 0.85rem;
   background: #fff;
   color: #3b2314;
 }
@@ -494,10 +518,10 @@ watch(
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1rem 1rem 1.1rem;
+  padding: 0.8rem 0.9rem;
   margin-bottom: 1rem;
   border: 1px solid rgba(174, 117, 76, 0.18);
-  border-radius: 18px;
+  border-radius: 14px;
   background: rgba(255, 250, 246, 0.9);
 }
 .logged-in-status p {
@@ -522,7 +546,7 @@ watch(
 }
 .form-heading h3 {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   color: #3b1f12;
 }
 .rating-input {
@@ -538,8 +562,8 @@ watch(
   gap: 0.4rem;
 }
 .star-input {
-  width: 2.6rem;
-  height: 2.6rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border-radius: 50%;
   border: 1px solid rgba(173, 101, 49, 0.22);
   background: rgba(255, 250, 240, 0.95);
@@ -558,10 +582,10 @@ watch(
 }
 .comment-field textarea {
   width: 100%;
-  min-height: 120px;
+  min-height: 96px;
   border: 1px solid rgba(174, 117, 76, 0.24);
-  border-radius: 16px;
-  padding: 1rem;
+  border-radius: 12px;
+  padding: 0.85rem;
   background: white;
   resize: vertical;
   color: #4e2f1d;
@@ -576,9 +600,9 @@ watch(
 .attachment-field input {
   width: 100%;
   margin-top: 0.5rem;
-  padding: 0.65rem 0.8rem;
+  padding: 0.6rem 0.75rem;
   border: 1px solid rgba(174, 117, 76, 0.24);
-  border-radius: 14px;
+  border-radius: 10px;
   background: #fff;
 }
 .attachment-name {
@@ -590,8 +614,8 @@ watch(
   margin-bottom: 1rem;
 }
 .attachment-preview img {
-  max-width: 160px;
-  border-radius: 16px;
+  max-width: 120px;
+  border-radius: 12px;
   border: 1px solid rgba(174, 117, 76, 0.2);
 }
 .form-actions {
@@ -603,9 +627,23 @@ watch(
 .btn {
   border: none;
   border-radius: 999px;
-  padding: 0.85rem 1.4rem;
+  width: 2.65rem;
+  min-width: 2.65rem;
+  min-height: 2.35rem;
+  padding: 0;
   cursor: pointer;
   font-weight: 700;
+  display: inline-grid;
+  place-items: center;
+}
+.btn-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .btn.primary {
   background: #a55f2e;
@@ -630,5 +668,17 @@ watch(
 }
 .status.success {
   color: #3f6d34;
+}
+
+@media (max-width: 680px) {
+  .review-header,
+  .logged-in-status {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .login-inputs {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 </style>

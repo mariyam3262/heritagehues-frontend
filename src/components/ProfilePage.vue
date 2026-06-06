@@ -39,8 +39,19 @@
         </div>
 
         <div v-if="!editing" class="profile-actions">
-          <button type="button" class="btn primary" @click="startEditing">Edit profile</button>
-          <button type="button" class="btn secondary" @click="logout">Sign out</button>
+          <button type="button" class="btn primary" aria-label="Edit profile" title="Edit profile" @click="startEditing">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+            </svg>
+          </button>
+          <button type="button" class="btn secondary" aria-label="Sign out" title="Sign out" @click="logout">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <path d="M16 17l5-5-5-5" />
+              <path d="M21 12H9" />
+            </svg>
+          </button>
         </div>
 
         <section v-if="isLoggedIn && !editing" class="profile-activity">
@@ -125,8 +136,16 @@
           <p v-if="successMessage" class="status success">{{ successMessage }}</p>
 
           <div class="profile-actions">
-            <button type="submit" class="btn primary">Save changes</button>
-            <button type="button" class="btn secondary" @click="cancelEditing">Cancel</button>
+            <button type="submit" class="btn primary" aria-label="Save changes" title="Save changes">
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </button>
+            <button type="button" class="btn secondary" aria-label="Cancel editing" title="Cancel" @click="cancelEditing">
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         </form>
 
@@ -151,8 +170,18 @@
         <p v-if="successMessage" class="status success">{{ successMessage }}</p>
 
         <div class="profile-actions">
-          <button type="button" class="btn primary" @click="login">Continue</button>
-          <a :href="homePath" class="btn secondary">Back to store</a>
+          <button type="button" class="btn primary" aria-label="Continue" title="Continue" @click="login">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14" />
+              <path d="M13 6l6 6-6 6" />
+            </svg>
+          </button>
+          <a :href="homePath" class="btn secondary" aria-label="Back to store" title="Back to store">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M19 12H5" />
+              <path d="M11 6l-6 6 6 6" />
+            </svg>
+          </a>
         </div>
       </div>
     </section>
@@ -455,12 +484,27 @@ onMounted(() => {
   margin-bottom: 1.5rem;
 }
 .profile-actions .btn {
-  min-width: 140px;
-  padding: 0.95rem 1.6rem;
+  width: 2.65rem;
+  min-width: 2.65rem;
+  min-height: 2.45rem;
+  padding: 0;
   border-radius: 999px;
   font-weight: 600;
   letter-spacing: 0.02em;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  display: inline-grid;
+  place-items: center;
+  text-decoration: none;
+}
+
+.btn-icon {
+  width: 1.12rem;
+  height: 1.12rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .profile-actions .btn.primary {
   background: #8f6642;

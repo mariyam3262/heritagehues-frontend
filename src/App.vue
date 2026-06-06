@@ -202,7 +202,10 @@
               Personalize your Bandhani with thoughtful complexity and colors, then receive a handcrafted estimate made with artisan care.
             </p>
             <button class="cta customize-open coming-soon-button" type="button" disabled aria-disabled="true">
-              Coming Soon
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 11V8a5 5 0 0 1 10 0v3" />
+                <path d="M6 11h12v10H6z" />
+              </svg>
             </button>
           </div>
 
@@ -257,12 +260,22 @@
           <label for="contact-message">Message</label>
           <textarea id="contact-message" rows="4" placeholder="Write a short message" v-model="contactMessage"></textarea>
 
-          <button type="submit" :disabled="contactLoading">
-            {{ contactLoading ? 'Sending...' : 'Send Message' }}
+          <button
+            type="submit"
+            :disabled="contactLoading"
+            :aria-label="contactLoading ? 'Sending message' : 'Send message'"
+            :title="contactLoading ? 'Sending message' : 'Send message'"
+          >
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M22 2L11 13" />
+              <path d="M22 2l-7 20-4-9-9-4 20-7z" />
+            </svg>
           </button>
         </form>
       </article>
     </section>
+
+    <SiteFooter />
 
     <nav class="slide-nav" aria-label="Slide navigation">
       <button
@@ -289,7 +302,9 @@
           aria-label="Close customization modal"
           @click="showCustomizationModal = false"
         >
-          x
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
         </button>
 
         <p class="eyebrow">Exclusive Design Studio</p>
@@ -330,8 +345,16 @@
         </p>
 
         <div class="modal-actions">
-          <button class="cta modal-action" type="button" @click="applyCustomization">Apply Customization</button>
-          <button class="modal-link" type="button" @click="showCustomizationModal = false">Close</button>
+          <button class="cta modal-action" type="button" aria-label="Apply customization" title="Apply customization" @click="applyCustomization">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
+          </button>
+          <button class="modal-link" type="button" aria-label="Close customization modal" title="Close" @click="showCustomizationModal = false">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       </section>
     </div>
@@ -731,18 +754,15 @@ const nextStorySlide = () => {
 @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:wght@400;500;600&display=swap");
 
 .page-shell {
-  height: 100svh;
+  min-height: 100svh;
   width: 100%;
   padding: 0;
-  overflow-y: auto;
-  scroll-snap-type: y mandatory;
+  overflow-y: visible;
   scroll-behavior: smooth;
 }
 
 .slide-window {
-  min-height: 100svh;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
+  min-height: auto;
   position: relative;
   overflow: hidden;
 }
@@ -752,12 +772,13 @@ const nextStorySlide = () => {
 }
 
 .intro-slide {
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
 }
 
 .brand-masthead {
-  min-height: clamp(96px, 18svh, 170px);
+  min-height: clamp(86px, 13svh, 128px);
   width: 100%;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -859,16 +880,16 @@ const nextStorySlide = () => {
   min-height: 0;
   width: 100%;
   flex: 1;
-  padding: clamp(1rem, 2.2vw, 2rem) clamp(1rem, 3.8vw, 3rem);
+  padding: clamp(1rem, 2.2vw, 1.6rem) clamp(1rem, 3.8vw, 3rem) clamp(1.5rem, 3vw, 2.4rem);
   display: grid;
   place-items: center;
 }
 
 .welcome-shell {
-  min-height: 100svh;
+  min-height: auto;
   width: 100%;
   max-width: 100%;
-  padding: clamp(2rem, 6vw, 4rem) clamp(0.75rem, 3.2vw, 2rem);
+  padding: clamp(2rem, 4.5vw, 3.2rem) clamp(0.75rem, 3.2vw, 2rem);
   display: grid;
   align-content: center;
   justify-items: center;
@@ -877,8 +898,7 @@ const nextStorySlide = () => {
 
 .welcome-panel {
   width: 100%;
-  max-width: 1040px;
-  max-width: 100%;
+  max-width: 1180px;
   min-width: 0;
   justify-self: stretch;
   border-radius: 22px;
@@ -1069,9 +1089,10 @@ const nextStorySlide = () => {
 
 .hero-panel {
   width: 100%;
+  max-width: 1280px;
   position: relative;
   border-radius: 22px;
-  padding: clamp(2rem, 6vw, 4.75rem);
+  padding: clamp(1.5rem, 4vw, 3rem);
   background:
     linear-gradient(130deg, rgba(36, 18, 14, 0.94), rgba(19, 10, 8, 0.94)),
     repeating-linear-gradient(
@@ -1108,7 +1129,7 @@ h1 {
   font-family: "Cinzel", serif;
   color: #fff1d8;
   line-height: 1.12;
-  font-size: clamp(2rem, 5.2vw, 4rem);
+  font-size: clamp(1.9rem, 4.4vw, 3.25rem);
 }
 
 .subheading {
@@ -1148,6 +1169,16 @@ h1 {
   transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
 }
 
+.btn-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .cta:hover,
 .cta:focus-visible {
   transform: translateY(-2px);
@@ -1176,20 +1207,20 @@ h1 {
 }
 
 .features-shell {
-  min-height: 100svh;
+  min-height: auto;
   width: 100%;
   margin: 0;
-  padding: clamp(2.3rem, 6vw, 4rem) clamp(1rem, 4vw, 3rem);
+  padding: clamp(2rem, 4.5vw, 3.2rem) clamp(1rem, 4vw, 3rem);
   display: grid;
   align-content: center;
   justify-items: center;
 }
 
 .customize-shell {
-  min-height: 100svh;
+  min-height: auto;
   width: 100%;
   margin: 0;
-  padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 4vw, 3rem);
+  padding: clamp(2rem, 4.5vw, 3.2rem) clamp(1rem, 4vw, 3rem);
   display: grid;
   align-content: center;
   justify-items: center;
@@ -1311,6 +1342,9 @@ h1 {
 
 .customize-open {
   margin-top: 0;
+  width: 2.8rem;
+  min-width: 2.8rem;
+  padding-inline: 0;
 }
 
 .coming-soon-button {
@@ -1329,10 +1363,10 @@ h1 {
 }
 
 .support-shell {
-  min-height: 100svh;
+  min-height: auto;
   width: 100%;
   margin: 0;
-  padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 4vw, 3rem);
+  padding: clamp(2rem, 4.5vw, 3.2rem) clamp(1rem, 4vw, 3rem);
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.8fr);
   gap: clamp(1rem, 2.3vw, 1.6rem);
@@ -1340,10 +1374,10 @@ h1 {
 }
 
 .contact-shell {
-  min-height: 100svh;
+  min-height: auto;
   width: 100%;
   margin: 0;
-  padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 4vw, 3rem);
+  padding: clamp(2rem, 4.5vw, 3.2rem) clamp(1rem, 4vw, 3rem);
   display: grid;
   align-content: center;
   justify-items: center;
@@ -1471,6 +1505,7 @@ h1 {
 .contact-form button {
   margin-top: 0.5rem;
   min-height: 3rem;
+  width: 3rem;
   border-radius: 12px;
   border: 1px solid rgba(117, 45, 23, 0.65);
   background: linear-gradient(120deg, #8f4124, #6e2a16);
@@ -1478,7 +1513,8 @@ h1 {
   font-family: "Cinzel", serif;
   font-size: 1rem;
   padding: 0 1.4rem;
-  width: min-content;
+  display: inline-grid;
+  place-items: center;
   cursor: pointer;
   transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
 }
@@ -1814,6 +1850,8 @@ h1 {
   height: 2.05rem;
   border-radius: 999px;
   cursor: pointer;
+  display: grid;
+  place-items: center;
 }
 
 .modal-group {
@@ -1875,14 +1913,21 @@ h1 {
 
 .modal-action {
   margin-top: 0;
+  width: 2.8rem;
+  min-width: 2.8rem;
+  padding-inline: 0;
 }
 
 .modal-link {
-  border: 0;
-  background: transparent;
+  width: 2.4rem;
+  min-height: 2.4rem;
+  border: 1px solid rgba(230, 192, 139, 0.32);
+  border-radius: 999px;
+  background: rgba(245, 225, 194, 0.1);
   color: #e6c08b;
-  font-family: "Cinzel", serif;
-  padding: 0.4rem 0.2rem;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
   cursor: pointer;
 }
 

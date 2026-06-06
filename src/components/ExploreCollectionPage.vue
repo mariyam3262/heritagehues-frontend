@@ -165,6 +165,9 @@ onBeforeUnmount(() => {
 }
 
 .explore-hero {
+  width: 100%;
+  max-width: 1520px;
+  margin-inline: auto;
   border-radius: 20px;
   border: 1px solid rgba(198, 154, 89, 0.38);
   padding: clamp(1rem, 2.8vw, 1.8rem);
@@ -250,7 +253,9 @@ h1 {
 }
 
 .filter-strip {
-  margin-top: 1rem;
+  width: 100%;
+  max-width: 1520px;
+  margin: 1rem auto 0;
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
@@ -273,7 +278,9 @@ h1 {
 }
 
 .status-line {
-  margin-top: 1rem;
+  width: 100%;
+  max-width: 1520px;
+  margin: 1rem auto 0;
   color: #5f2215;
 }
 
@@ -282,10 +289,12 @@ h1 {
 }
 
 .collection-grid {
-  margin-top: 1rem;
+  width: 100%;
+  max-width: 1520px;
+  margin: 1rem auto 0;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.8rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
 }
 
 .collection-card {
@@ -294,23 +303,24 @@ h1 {
   background: linear-gradient(130deg, rgba(53, 25, 19, 0.9), rgba(24, 12, 9, 0.95));
   padding: 0.8rem;
   box-shadow: 0 12px 20px rgba(8, 3, 2, 0.32);
+  display: flex;
+  flex-direction: column;
 }
 
 .card-image,
 .card-swatch {
   width: 100%;
-  min-height: 240px;
+  aspect-ratio: 4 / 5;
   border-radius: 12px;
 }
 
 .card-image {
   object-fit: cover;
+  object-position: center top;
   display: block;
 }
 
 .card-swatch {
-  height: 132px;
-  border-radius: 12px;
   border: 1px solid rgba(226, 185, 125, 0.35);
 }
 
@@ -359,7 +369,8 @@ h2 {
 }
 
 .card-foot {
-  margin-top: 0.8rem;
+  margin-top: auto;
+  padding-top: 0.8rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
